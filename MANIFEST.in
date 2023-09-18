@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include mapro *.css
+recursive-include mapro *.csv
+recursive-include mapro *.html
+recursive-include mapro *.ico
+recursive-include mapro *.js
+recursive-include mapro *.json
+recursive-include mapro *.md
+recursive-include mapro *.png
+recursive-include mapro *.py
+recursive-include mapro *.svg
+recursive-include mapro *.txt
+recursive-exclude mapro *.pyc

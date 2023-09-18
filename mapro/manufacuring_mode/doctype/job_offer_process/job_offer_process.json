@@ -1,0 +1,305 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:job_order_name",
+ "creation": "2023-03-21 11:44:34.843319",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_1",
+  "job_order_name",
+  "process_defination",
+  "workstation",
+  "process_type",
+  "costing_method",
+  "column_break_5",
+  "date",
+  "department",
+  "value_scrap",
+  "quantity",
+  "update_qty",
+  "materials_section",
+  "materials",
+  "section_break_k9x0i",
+  "materials_qty",
+  "column_break_kwyzv",
+  "materials_amount",
+  "section_break_jz8l1",
+  "operation_cost",
+  "total_operation_cost",
+  "finished_products_section",
+  "finished_products",
+  "section_break_iabz5",
+  "finished_products_qty",
+  "column_break_qhjvb",
+  "finished_products_amount",
+  "scrap_section",
+  "scrap",
+  "section_break_zklxu",
+  "scrap_qty",
+  "all_finish_qty",
+  "column_break_mdkf0",
+  "scrap_amount",
+  "total_all_amount",
+  "column_break_36",
+  "diff_qty",
+  "diff_amt",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "workstation",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Workstation",
+   "options": "Workstation"
+  },
+  {
+   "fieldname": "process_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Process Type",
+   "options": "Process Type"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Department",
+   "options": "Manufacturing Department"
+  },
+  {
+   "default": "Physical measurement",
+   "fieldname": "costing_method",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Costing Method",
+   "options": "\nPhysical measurement\nRelative Sales Value",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "value_scrap",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Include Scrap in Valuation"
+  },
+  {
+   "fieldname": "materials_section",
+   "fieldtype": "Section Break",
+   "label": "Materials"
+  },
+  {
+   "fieldname": "materials",
+   "fieldtype": "Table",
+   "label": "Materials ",
+   "options": "Process Item"
+  },
+  {
+   "fieldname": "section_break_k9x0i",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "materials_qty",
+   "fieldtype": "Float",
+   "label": "Total Materials  Qty",
+   "precision": "2"
+  },
+  {
+   "fieldname": "column_break_kwyzv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "materials_amount",
+   "fieldtype": "Currency",
+   "label": "Total Materials  Amount",
+   "precision": "2"
+  },
+  {
+   "fieldname": "section_break_jz8l1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "operation_cost",
+   "fieldtype": "Table",
+   "label": "Operation Cost",
+   "options": "Operation Cost"
+  },
+  {
+   "fieldname": "total_operation_cost",
+   "fieldtype": "Currency",
+   "label": "Total Operation Cost"
+  },
+  {
+   "fieldname": "finished_products_section",
+   "fieldtype": "Section Break",
+   "label": "Finished Products"
+  },
+  {
+   "fieldname": "finished_products",
+   "fieldtype": "Table",
+   "label": "Finished Products",
+   "options": "Process Item"
+  },
+  {
+   "fieldname": "section_break_iabz5",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "finished_products_qty",
+   "fieldtype": "Float",
+   "label": "Total Finished Qty",
+   "precision": "2"
+  },
+  {
+   "fieldname": "column_break_qhjvb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "finished_products_amount",
+   "fieldtype": "Currency",
+   "label": "Total Finished Amount",
+   "precision": "2"
+  },
+  {
+   "fieldname": "scrap_section",
+   "fieldtype": "Section Break",
+   "label": "Scrap"
+  },
+  {
+   "fieldname": "scrap",
+   "fieldtype": "Table",
+   "label": "Scrap",
+   "options": "Process Item"
+  },
+  {
+   "fieldname": "section_break_zklxu",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "scrap_qty",
+   "fieldtype": "Float",
+   "label": "Total Scrap Qty",
+   "precision": "2"
+  },
+  {
+   "fieldname": "all_finish_qty",
+   "fieldtype": "Float",
+   "label": "Output Qty",
+   "precision": "2"
+  },
+  {
+   "fieldname": "column_break_mdkf0",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "scrap_amount",
+   "fieldtype": "Currency",
+   "label": "Total Scrap  Amount",
+   "precision": "2"
+  },
+  {
+   "fieldname": "total_all_amount",
+   "fieldtype": "Currency",
+   "label": "Total Output amount",
+   "precision": "2"
+  },
+  {
+   "fieldname": "process_defination",
+   "fieldtype": "Link",
+   "label": "Process Defination",
+   "options": "Process Definition"
+  },
+  {
+   "default": "1",
+   "fieldname": "quantity",
+   "fieldtype": "Data",
+   "label": "quantity"
+  },
+  {
+   "fieldname": "update_qty",
+   "fieldtype": "Button",
+   "label": "Update Qty"
+  },
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "job_order_name",
+   "fieldtype": "Data",
+   "label": "Job Order Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "diff_qty",
+   "fieldtype": "Float",
+   "label": "Difference Quantity",
+   "precision": "2"
+  },
+  {
+   "fieldname": "diff_amt",
+   "fieldtype": "Currency",
+   "label": "Difference  Amount",
+   "precision": "2"
+  },
+  {
+   "fieldname": "column_break_36",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Job Offer Process",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [
+  {
+   "link_doctype": "Process Order",
+   "link_fieldname": "process_name"
+  }
+ ],
+ "modified": "2023-04-26 10:21:20.631012",
+ "modified_by": "Administrator",
+ "module": "manufacuring mode",
+ "name": "Job Offer Process",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
