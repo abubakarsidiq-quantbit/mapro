@@ -26,6 +26,7 @@
   "section_break_jz8l1",
   "operation_cost",
   "total_operation_cost",
+  "single_qty_cost",
   "finished_products_section",
   "finished_products",
   "section_break_iabz5",
@@ -201,8 +202,9 @@
   },
   {
    "fieldname": "total_operation_cost",
-   "fieldtype": "Data",
-   "label": "Total Operation Cost"
+   "fieldtype": "Float",
+   "label": "Total Operation Cost",
+   "precision": "2"
   },
   {
    "fieldname": "all_finish_qty",
@@ -242,6 +244,12 @@
    "fieldname": "diff_amt",
    "fieldtype": "Currency",
    "label": "Difference  Amount"
+  },
+  {
+   "fieldname": "single_qty_cost",
+   "fieldtype": "Float",
+   "label": "single qty cost",
+   "precision": "2"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -251,7 +259,7 @@
    "link_fieldname": "process_defination"
   }
  ],
- "modified": "2023-04-26 10:07:18.987513",
+ "modified": "2024-02-01 17:21:05.596786",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Process Definition",

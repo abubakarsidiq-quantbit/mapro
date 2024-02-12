@@ -1,5 +1,29 @@
+
+frappe.ui.form.on("Process Item", "item", function(frm, cdt, cdn) {
+	var d = locals[cdt][cdn];
+	frm.call({
+		method:'Get_Purchase_Rate',	
+		doc: frm.doc,
+		args:{
+			item:d.item,
+			index:d.idx
+		}
+	});
+});
+
+// frappe.ui.form.on('Process Order', {
+// 	quantity: function(frm) {
+// 		frm.clear_table("operation_cost")
+// 		frm.refresh_field('operation_cost')
+// 		frm.call({
+// 			method:'upend_opcost_table',
+// 			doc: frm.doc,
+// 		});
+// 	}
+//   });
+
+
 frappe.ui.form.on("Process Order Item", {
-    
     materials_update(frm){
      frm.call({
          method:'itrate',
@@ -9,7 +33,6 @@ frappe.ui.form.on("Process Order Item", {
   });
 
 frappe.ui.form.on("Process Order Item", {
-    
     materials_remove(frm){
      frm.call({
          method:'qtyupdate',
@@ -19,7 +42,6 @@ frappe.ui.form.on("Process Order Item", {
   });
 
 frappe.ui.form.on("Process Order Item", {
-    
    finished_products_remove(frm){
     frm.call({
         method:'qtyupdate',
@@ -29,7 +51,6 @@ frappe.ui.form.on("Process Order Item", {
  });
 
  frappe.ui.form.on("Process Order Item", {
-    
     scrap_remove(frm){
      frm.call({
          method:'qtyupdate',

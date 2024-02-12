@@ -1,5 +1,29 @@
 // Copyright (c) 2023, Pradip and contributors
 // For license information, please see license.txt
+frappe.ui.form.on("Process Item", "item", function(frm, cdt, cdn) {
+	var d = locals[cdt][cdn];
+	frm.call({
+		method:'Get_Purchase_Rate',	
+		doc: frm.doc,
+		args:{
+			item:d.item,
+			index:d.idx
+		}
+	});
+});
+
+// frappe.ui.form.on('Job Offer Process', {
+// 	quantity: function(frm) {
+// 		frm.clear_table("operation_cost")
+// 		frm.refresh_field('operation_cost')
+// 		frm.call({
+// 			method:'upend_opcost_table',
+// 			doc: frm.doc,
+// 		});
+// 	}
+//   });
+
+
 
 frappe.ui.form.on('Job Offer Process', {
 	process_defination:function(frm){

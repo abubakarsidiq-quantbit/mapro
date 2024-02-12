@@ -11,12 +11,15 @@
   "section_break_1",
   "naming_series",
   "job_offer",
-  "job_order_qty",
-  "process_name",
-  "workstation",
-  "process_type",
   "column_break_6",
+  "job_order_qty",
+  "workstation",
+  "column_break_hnvvp",
+  "process_name",
+  "process_type",
   "status",
+  "project",
+  "column_break_xja5t",
   "department",
   "costing_method",
   "warehouses_section",
@@ -33,6 +36,8 @@
   "materials_qty",
   "column_break_00kjp",
   "materials_amount",
+  "column_break_9imxp",
+  "definition_material_qty",
   "section_break_lu7if",
   "operation_cost",
   "total_operation_cost",
@@ -42,6 +47,8 @@
   "finished_products_qty",
   "column_break_wfaqz",
   "finished_products_amount",
+  "column_break_ypkfj",
+  "total_sale_value",
   "scrap_section",
   "scrap",
   "section_break_mfai4",
@@ -52,6 +59,7 @@
   "total_all_amount",
   "section_break_41",
   "column_break_41",
+  "total_scrap_sale_value",
   "diff_qty",
   "column_break_43",
   "diff_amt",
@@ -293,8 +301,9 @@
   {
    "default": "1",
    "fieldname": "quantity",
-   "fieldtype": "Data",
-   "label": "Quantity"
+   "fieldtype": "Float",
+   "label": "Quantity",
+   "precision": "2"
   },
   {
    "fieldname": "update_qty",
@@ -361,15 +370,56 @@
   {
    "fetch_from": "job_offer.quantity",
    "fieldname": "job_order_qty",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "hidden": 1,
-   "label": "job Order Qty"
+   "label": "job Order Qty",
+   "precision": "2"
+  },
+  {
+   "fieldname": "column_break_hnvvp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "column_break_xja5t",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ypkfj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_sale_value",
+   "fieldtype": "Float",
+   "label": "Total Sale Value",
+   "precision": "2"
+  },
+  {
+   "fieldname": "total_scrap_sale_value",
+   "fieldtype": "Float",
+   "label": "Total Scrap Sale Value",
+   "precision": "2"
+  },
+  {
+   "fieldname": "column_break_9imxp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "definition_material_qty",
+   "fieldtype": "Float",
+   "label": "Definition Material QTY",
+   "precision": "2"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-09-14 16:24:09.336753",
+ "modified": "2024-02-02 15:02:46.715658",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Process Order",

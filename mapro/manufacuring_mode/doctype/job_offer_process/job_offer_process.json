@@ -18,14 +18,26 @@
   "date",
   "department",
   "value_scrap",
+  "project",
+  "column_break_33jfg",
+  "status",
   "quantity",
   "update_qty",
+  "warehouse_manage_section",
+  "src_warehouse",
+  "column_break_iv5im",
+  "wip_warehouse",
+  "column_break_34arf",
+  "fg_warehouse",
+  "column_break_amlxn",
+  "scrap_warehouse",
   "materials_section",
   "materials",
   "section_break_k9x0i",
   "materials_qty",
   "column_break_kwyzv",
   "materials_amount",
+  "definition_material_qty",
   "section_break_jz8l1",
   "operation_cost",
   "total_operation_cost",
@@ -35,6 +47,8 @@
   "finished_products_qty",
   "column_break_qhjvb",
   "finished_products_amount",
+  "column_break_faaxh",
+  "total_sale_value",
   "scrap_section",
   "scrap",
   "section_break_zklxu",
@@ -44,6 +58,7 @@
   "scrap_amount",
   "total_all_amount",
   "column_break_36",
+  "total_scrap_sale_value",
   "diff_qty",
   "diff_amt",
   "amended_from"
@@ -77,9 +92,9 @@
   {
    "fieldname": "department",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Department",
-   "options": "Manufacturing Department"
+   "options": "Manufacturing Department",
+   "reqd": 1
   },
   {
    "default": "Physical measurement",
@@ -206,6 +221,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "default": "0",
    "fieldname": "scrap_amount",
    "fieldtype": "Currency",
    "label": "Total Scrap  Amount",
@@ -226,8 +242,9 @@
   {
    "default": "1",
    "fieldname": "quantity",
-   "fieldtype": "Data",
-   "label": "quantity"
+   "fieldtype": "Float",
+   "label": "quantity",
+   "precision": "2"
   },
   {
    "fieldname": "update_qty",
@@ -270,16 +287,104 @@
    "options": "Job Offer Process",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "column_break_33jfg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Working",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Working\nComplete"
+  },
+  {
+   "fieldname": "warehouse_manage_section",
+   "fieldtype": "Section Break",
+   "label": "Warehouse Manage"
+  },
+  {
+   "fetch_from": "department.src_warehouse",
+   "fieldname": "src_warehouse",
+   "fieldtype": "Link",
+   "label": " Source Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "column_break_iv5im",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "department.wip_warehouse",
+   "fieldname": "wip_warehouse",
+   "fieldtype": "Link",
+   "label": "WIP Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "column_break_34arf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "department.fg_warehouse",
+   "fieldname": "fg_warehouse",
+   "fieldtype": "Link",
+   "label": "Target Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "column_break_amlxn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "department.scrap_warehouse",
+   "fieldname": "scrap_warehouse",
+   "fieldtype": "Link",
+   "label": "Scrap Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "column_break_faaxh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "total_sale_value",
+   "fieldtype": "Float",
+   "label": "Total Sale Value",
+   "precision": "2"
+  },
+  {
+   "default": "0",
+   "fieldname": "total_scrap_sale_value",
+   "fieldtype": "Float",
+   "label": "Total Scrap Sale Value",
+   "precision": "2"
+  },
+  {
+   "fieldname": "definition_material_qty",
+   "fieldtype": "Float",
+   "label": "Definition Material QTY",
+   "precision": "2",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [
   {
    "link_doctype": "Process Order",
-   "link_fieldname": "process_name"
+   "link_fieldname": "job_offer"
   }
  ],
- "modified": "2023-04-26 10:21:20.631012",
+ "modified": "2024-02-01 11:05:17.719258",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Job Offer Process",
@@ -287,6 +392,8 @@
  "owner": "Administrator",
  "permissions": [
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -295,7 +402,9 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "select": 1,
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],

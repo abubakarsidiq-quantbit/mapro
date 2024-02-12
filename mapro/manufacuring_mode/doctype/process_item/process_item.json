@@ -14,7 +14,14 @@
   "quantity",
   "amount",
   "item_name",
-  "in_qty"
+  "in_qty",
+  "manufacturing_rate",
+  "basic_value",
+  "sale_value",
+  "operation_cost",
+  "valuation_rate",
+  "total_cost",
+  "batch_no"
  ],
  "fields": [
   {
@@ -43,7 +50,7 @@
    "fieldname": "rate",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Rate",
+   "label": "Basic Rate",
    "precision": "2"
   },
   {
@@ -69,16 +76,66 @@
    "options": "UOM"
   },
   {
+   "allow_on_submit": 1,
    "default": "0",
    "fieldname": "in_qty",
    "fieldtype": "Check",
    "label": "In Qty"
+  },
+  {
+   "default": "0",
+   "fieldname": "manufacturing_rate",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Manufacturing Rate",
+   "precision": "2"
+  },
+  {
+   "default": "0",
+   "fieldname": "basic_value",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Basic Value",
+   "precision": "2"
+  },
+  {
+   "default": "0",
+   "fieldname": "sale_value",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Sale Value",
+   "precision": "2"
+  },
+  {
+   "fieldname": "operation_cost",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Operation Cost",
+   "precision": "2"
+  },
+  {
+   "fieldname": "valuation_rate",
+   "fieldtype": "Float",
+   "label": "Valuation Rate",
+   "precision": "2"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Float",
+   "label": "Total Cost",
+   "precision": "2"
+  },
+  {
+   "fieldname": "batch_no",
+   "fieldtype": "Link",
+   "label": "Batch No",
+   "options": "Batch"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-09-15 13:45:50.028344",
+ "modified": "2024-02-02 18:16:39.971806",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Process Item",

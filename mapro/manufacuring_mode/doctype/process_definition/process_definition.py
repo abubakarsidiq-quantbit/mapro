@@ -28,6 +28,7 @@ class ProcessDefinition(Document):
 			m.amount=tbam
 			mam=float(mam)+float(m.amount)
 			
+			
 		self.materials_qty=mqty
 		self.materials_amount=mam
    
@@ -63,10 +64,13 @@ class ProcessDefinition(Document):
 		self.total_operation_cost=tocq
 		self.diff_qty=float(self.all_finish_qty)-float(self.materials_qty)
 		self.diff_amt=float(self.materials_amount+self.total_operation_cost)-float(self.total_all_amount)
+		self.single_qty_cost = self.total_operation_cost / self.materials_qty
 
-@frappe.whitelist()
-def Get_Purchase_Rate(item):
-	query = """select  valuation_rate from `tabStock Ledger Entry` where item_code = %(items)s order by creation LIMIT 1"""
-	data = frappe.db.sql(query, {"items": item},as_dict=1)
-	return data
+	@frappe.whitelist()
+	def Get_Purchase_Rate(item):
+		query = """select  valuation_rate from `tabBin` where item_code = %(items)s order by creation LIMIT 1"""
+		data = frappe.db.sql(query, {"items": item},as_dict=1)
+		return data
+
+
 
