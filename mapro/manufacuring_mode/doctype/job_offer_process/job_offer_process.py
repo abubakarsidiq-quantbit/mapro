@@ -28,6 +28,11 @@ class JobOfferProcess(Document):
 			doc1=frappe.get_doc('Process Definition',d.name)
 			if(self.process_defination==d.name):
 				self.definition_material_qty = doc1.materials_qty
+				self.materials_amount = doc1.materials_amount
+				self.total_operation_cost = doc1.total_operation_cost
+				self.materials_qty = doc1.materials_qty
+				self.finished_products_qty = doc1.finished_products_qty
+				self.finished_products_amount = doc1.finished_products_amount + doc1.total_operation_cost
 				for d1 in doc1.get("operation_cost"):
 					self.append("operation_cost",{
 							"operations":d1.operations,
@@ -148,11 +153,17 @@ class JobOfferProcess(Document):
 				fp.rate = fp.basic_value / fp.quantity
 			fp.amount = fp.rate * fp.quantity
   
-		for sc in self.get('scrap'):	
-			sc.quantity=str((int(sc.quantity)*int(self.quantity))/int(temp))
-			sc.quantity = (sc.yeild / 100) * self.materials_qty
-			tbam=float(sc.quantity)*float(sc.rate)
-			sc.amount=tbam
+		for sc in self.get('scrap'):
+			if self.quantity:	
+				sc.quantity=str((int(sc.quantity)*int(self.quantity))/int(temp))
+				sc.quantity = (sc.yeild / 100) * self.materials_qty
+				tbam=float(sc.quantity)*float(sc.rate)
+				sc.amount=tbam
+				if sc.sale_value >0:
+					sc.basic_value = (sc.sale_value / (self.total_sale_value +self.total_scrap_sale_value)) * (self.materials_amount)
+				if sc.quantity:
+					sc.rate = sc.basic_value / sc.quantity
+					sc.amount = sc.rate * sc.quantity
 			# scam=float(scam)+float(sc.amount)
 			# scq=float(scq)+float(sc.quantity)
 			# pricelst = frappe.get_value("Manufacturing Rate Chart",{'process_type':self.process_type,"item_code":sc.item},"rate")
@@ -160,10 +171,6 @@ class JobOfferProcess(Document):
 			# sc.sale_value = sc.quantity * sc.manufacturing_rate
 			# self.total_scrap_sale_value = sum(sc.sale_value for sc in self.get("scrap"))
 			# sc.basic_value = (sc.sale_value / (self.total_sale_value +self.total_scrap_sale_value)) * (self.materials_amount + self.total_operation_cost)
-			if sc.sale_value >0:
-				sc.basic_value = (sc.sale_value / (self.total_sale_value +self.total_scrap_sale_value)) * (self.materials_amount)
-			sc.rate = sc.basic_value / sc.quantity
-			sc.amount = sc.rate * sc.quantity
 
 		
 		# self.scrap_qty=scq
@@ -186,7 +193,7 @@ class JobOfferProcess(Document):
 			if ok.amount >0:
 				ok.operation_cost = ( ok.amount / self.total_all_amount ) * self.total_operation_cost
 			ok.total_cost = ok.amount + ok.operation_cost
-			if ok.total_cost>0:
+			if ok.total_cost>0 and ok.quantity:
 				ok.valuation_rate = ok.total_cost / ok.quantity
 		for yes in self.get('scrap'):
 			if yes.amount >0:

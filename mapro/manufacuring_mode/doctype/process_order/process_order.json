@@ -69,7 +69,8 @@
   "end_dt",
   "company",
   "operation_hours",
-  "amended_from"
+  "amended_from",
+  "subcontracting"
  ],
  "fields": [
   {
@@ -185,6 +186,7 @@
    "label": "Finished Products"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "finished_products",
    "fieldtype": "Table",
    "label": "Finished Products",
@@ -196,6 +198,7 @@
    "label": "Scrap"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "scrap",
    "fieldtype": "Table",
    "label": "Scrap",
@@ -241,12 +244,14 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "materials_qty",
    "fieldtype": "Float",
    "label": "Total Qty",
    "precision": "2"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "materials_amount",
    "fieldtype": "Currency",
    "label": "Total Amount",
@@ -261,10 +266,12 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "section_break_qhfbp",
    "fieldtype": "Section Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "finished_products_qty",
    "fieldtype": "Float",
    "label": "Total Qty "
@@ -274,6 +281,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "finished_products_amount",
    "fieldtype": "Currency",
    "label": "Total Amount"
@@ -283,6 +291,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "scrap_qty",
    "fieldtype": "Float",
    "label": "Total Qty ",
@@ -293,6 +302,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "scrap_amount",
    "fieldtype": "Currency",
    "label": "Total Amount",
@@ -315,23 +325,27 @@
    "fieldtype": "Section Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "operation_cost",
    "fieldtype": "Table",
    "label": "Operation Cost",
    "options": "Operation Cost"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "total_operation_cost",
    "fieldtype": "Currency",
    "label": "Total Operation Cost"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "all_finish_qty",
    "fieldtype": "Float",
    "label": "All Finish Qty",
    "precision": "2"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "total_all_amount",
    "fieldtype": "Currency",
    "label": "Total all amount",
@@ -342,6 +356,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "diff_qty",
    "fieldtype": "Float",
    "label": "Difference Quantity",
@@ -352,6 +367,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "diff_amt",
    "fieldtype": "Currency",
    "label": "Difference Amount",
@@ -394,12 +410,15 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "total_sale_value",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Total Sale Value",
    "precision": "2"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "total_scrap_sale_value",
    "fieldtype": "Float",
    "label": "Total Scrap Sale Value",
@@ -414,12 +433,24 @@
    "fieldtype": "Float",
    "label": "Definition Material QTY",
    "precision": "2"
+  },
+  {
+   "default": "0",
+   "fieldname": "subcontracting",
+   "fieldtype": "Check",
+   "label": "Subcontracting",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
- "links": [],
- "modified": "2024-02-02 15:02:46.715658",
+ "links": [
+  {
+   "link_doctype": "Proposed Stock Entry",
+   "link_fieldname": "process_order"
+  }
+ ],
+ "modified": "2024-06-07 11:23:55.871558",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Process Order",

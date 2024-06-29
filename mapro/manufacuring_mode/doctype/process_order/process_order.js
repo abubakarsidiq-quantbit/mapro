@@ -92,15 +92,15 @@ frappe.ui.form.on('Process Order Item', {
 		});
 	}
 })
-frappe.ui.form.on('Operation Cost', {
-	cost:function(frm) {
-        frm.clear_table("operation_cost")
-		frm.call({
-			method:'qtyupdate',
-			doc: frm.doc,
-		});
-	}
-})
+// frappe.ui.form.on('Operation Cost', {
+// 	cost:function(frm) {
+//         frm.clear_table("operation_cost")
+// 		frm.call({
+// 			method:'qtyupdate',
+// 			doc: frm.doc,
+// 		});
+// 	}
+// })
 
 
   frappe.ui.form.on('Process Order', {
@@ -147,7 +147,8 @@ frappe.ui.form.on('Process Order', {
         });
     },
     refresh: function (frm) {
-        if (!frm.doc.__islocal && frm.doc.status == 'Submitted') {
+        
+        if (!frm.doc.__islocal && frm.doc.status == 'Submitted' && frm.doc.subcontracting == 0) {
             var start_btn = frm.add_custom_button(__('Start'), function () {
                 prompt_for_qty(frm, "materials", "Enter Raw Material Quantity", true, function () {
                     process_production(frm, "Submitted");
