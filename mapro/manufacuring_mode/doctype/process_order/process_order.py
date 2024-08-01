@@ -160,11 +160,11 @@ class ProcessOrder(Document):
 		# self.scrap_qty=scq
 		# self.scrap_amount=scam
 		self.finished_products_amount  = sum(fp.amount for fp in self.get("finished_products"))
-		if self.scrap_qty and self.finished_products_qty:
+		if self.scrap_qty or self.finished_products_qty:
 			self.all_finish_qty=self.finished_products_qty+ self.scrap_qty
 		else:
 			self.all_finish_qty = 0
-		if self.scrap_amount and self.finished_products_amount:
+		if self.scrap_amount or self.finished_products_amount:
 			self.total_all_amount=self.finished_products_amount+self.scrap_amount
 		else:
 			self.total_all_amount = 0
