@@ -219,9 +219,9 @@ class ProcessOrder(Document):
 								WHERE job_offer=%s
 							""",(self.job_offer),as_dict="True")
 		tota_soso = (data[0]['quantity']) if (data[0]['quantity'])	 else 0
-		frappe.msgprint(str(tota_soso))
+		# frappe.msgprint(str(tota_soso))
 		src_wh,name= frappe.db.get_value("Job Offer Process", {'name':self.job_offer},["quantity","name"])
-		frappe.msgprint(str(src_wh))
+		# frappe.msgprint(str(src_wh))
 		if tota_soso == src_wh:
 			frappe.db.set_value("Job Offer Process",name,'status',"Completed")
 		else:

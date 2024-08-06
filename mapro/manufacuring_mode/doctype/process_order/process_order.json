@@ -230,6 +230,7 @@
    "options": "Company"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "operation_hours",
    "fieldtype": "Float",
    "label": "Hours of Operation"
@@ -450,7 +451,7 @@
    "link_fieldname": "process_order"
   }
  ],
- "modified": "2024-06-07 11:23:55.871558",
+ "modified": "2024-08-01 12:33:25.525292",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Process Order",

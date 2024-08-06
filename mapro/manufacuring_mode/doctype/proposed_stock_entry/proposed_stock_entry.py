@@ -59,7 +59,7 @@ class ProposedStockEntry(Document):
 					'expense_account': se.expense_account,
 					'cost_center': se.cost_center,
 					'transfer_qty': se.transfer_qty,
-					'conversion_factor': 1.00
+					'conversion_factor': 1.00,
 				})
 			
 			stock_entry.total_outgoing_value = self.total_outgoing_value
@@ -89,27 +89,35 @@ class ProposedStockEntry(Document):
 					stock_entry.stock_entry_type = "Manufacture"
 					stock_entry.set_posting_time = True
 					stock_entry.posting_date = self.posting_date
-					stock_entry.append(
-						"items",
-						{
-							"item_code": self.items[0].item_code,
-							"qty": ((self.items[0].qty)/(po.finished_products_qty))*self.items[d].qty,
-							"uom": self.items[0].uom,
-							"s_warehouse": po.fg_warehouse,
-							"batch_no": self.items[0].batch_no
-						},
-					)
-					stock_entry.append(
-						"items",
-						{
-							"item_code": self.items[d].item_code,
-							"qty": self.items[d].qty,
-							"uom": 'KGS',
-							"t_warehouse": po.wip_warehouse,
-							"batch_no": self.items[d].batch_no,
-							"is_finished_item": True
-						},
-					)	
+					if self.items[0].cost_center:
+						stock_entry.append(
+							"items",
+							{
+								"item_code": self.items[0].item_code,
+								"qty": ((self.items[0].qty)/(po.finished_products_qty))*self.items[d].qty,
+								"uom": self.items[0].uom,
+								"s_warehouse": po.fg_warehouse,
+								"batch_no": self.items[0].batch_no,
+								"cost_center": self.items[0].cost_center
+							},
+						)
+					else:
+						frappe.throw("Cost Center Is Mandatory")
+					if self.items[d].cost_center:
+						stock_entry.append(
+							"items",
+							{
+								"item_code": self.items[d].item_code,
+								"qty": self.items[d].qty,
+								"uom": 'KGS',
+								"t_warehouse": po.wip_warehouse,
+								"batch_no": self.items[d].batch_no,
+								"is_finished_item": True,
+								"cost_center": self.items[d].cost_center
+							},
+						)
+					else:
+						frappe.throw("Cost Center Is Mandatory")
 					for k in self.get("additional_costs"):
 						stock_entry.append("additional_costs",{
 								"expense_account": k.expense_account,
@@ -117,6 +125,7 @@ class ProposedStockEntry(Document):
 								"amount": (k.amount * self.items[d].qty)/po.finished_products_qty,
 							},
 						)
+					stock_entry.cost_center = self.cost_center
 					stock_entry.total_additional_costs = sum(tot_op.amount for tot_op in stock_entry.additional_costs)
 					stock_entry.insert()
 					stock_entry.save()

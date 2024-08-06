@@ -722,7 +722,8 @@
    "fieldname": "cost_center",
    "fieldtype": "Link",
    "label": "Cost Center",
-   "options": "Cost Center"
+   "options": "Cost Center",
+   "reqd": 1
   },
   {
    "fieldname": "total_difference_",
@@ -774,7 +775,7 @@
    "link_fieldname": "custom_proposed_stock_entry"
   }
  ],
- "modified": "2024-06-07 13:45:18.066107",
+ "modified": "2024-08-01 13:23:00.384779",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Proposed Stock Entry",
