@@ -11,17 +11,21 @@
   "yeild",
   "rate",
   "uom",
+  "column_break_ffm20",
   "quantity",
   "amount",
   "item_name",
   "in_qty",
+  "column_break_qgxds",
   "manufacturing_rate",
   "basic_value",
   "sale_value",
   "operation_cost",
+  "column_break_2imvc",
   "valuation_rate",
   "total_cost",
-  "batch_no"
+  "batch_no",
+  "warehouse"
  ],
  "fields": [
   {
@@ -130,12 +134,30 @@
    "fieldtype": "Link",
    "label": "Batch No",
    "options": "Batch"
+  },
+  {
+   "fieldname": "column_break_ffm20",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_qgxds",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_2imvc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Warehouse",
+   "options": "Warehouse"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-02-02 18:16:39.971806",
+ "modified": "2024-08-08 11:01:35.938273",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Process Item",

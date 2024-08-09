@@ -35,7 +35,6 @@ class ProcessDefinition(Document):
 		self.materials_amount=mam
 
 		for fp in self.get('finished_products'):
-			# fp.quantity=str((int(fp.quantity)*int(self.quantity))/int(temp))
 			fp.quantity = (fp.yeild / 100) * self.materials_qty
 			fpq=float(fpq)+float(fp.quantity)
 			tbam=float(fp.quantity)*float(fp.rate)
@@ -91,7 +90,6 @@ def qtyupdate(self):
 	self.materials_amount=mam
 
 	for fp in self.get('finished_products'):
-		# fp.quantity=str((int(fp.quantity)*int(self.quantity))/int(temp))
 		fp.quantity = (fp.yeild / 100) * self.materials_qty
 		fpq=float(fpq)+float(fp.quantity)
 		tbam=float(fp.quantity)*float(fp.rate)
@@ -102,7 +100,6 @@ def qtyupdate(self):
 	self.finished_products_amount=fpam
 	
 	for sc in self.get('scrap'):
-		# sc.quantity=str((int(sc.quantity)*int(self.quantity))/int(temp))
 		sc.quantity = (sc.yeild / 100) * self.materials_qty
 		scq=float(scq)+float(sc.quantity)
 		tbam=float(sc.quantity)*float(sc.rate)
@@ -116,7 +113,6 @@ def qtyupdate(self):
 	self.total_all_amount=self.finished_products_amount+self.scrap_amount
 	
 	for toc in self.get('operation_cost'):
-		# toc.cost=str((int(toc.cost)*int(self.quantity))/int(temp))
 		tocq=float(tocq)+float(toc.cost)
 		
 	self.total_operation_cost=tocq

@@ -130,7 +130,7 @@ class ProcessOrder(Document):
 				self.scrap_qty = sum(sc.quantity for sc in self.get("scrap"))
 				self.scrap_amount = sum(sc.amount for sc in self.get("scrap"))
 				self.total_scrap_sale_value = sum(sc.sale_value for sc in self.get("scrap"))
-			if fp.sale_value >0:
+			if fp.sale_value >0 and (self.total_sale_value +self.total_scrap_sale_value):
 				fp.basic_value = (fp.sale_value / (self.total_sale_value +self.total_scrap_sale_value)) * (self.materials_amount)
 			# fp.basic_value = (fp.sale_value / (self.total_sale_value +self.total_scrap_sale_value)) * (self.materials_amount + self.total_operation_cost)
 			# if fp.basic_value >0:

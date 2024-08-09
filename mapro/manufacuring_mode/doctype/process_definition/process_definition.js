@@ -11,7 +11,7 @@
 // 				callback: function(r) {	
 // 						frm.refresh_field('itemwise_batch_details');
 // 						var prate = r.message[0]["valuation_rate"];
-// 						 frappe.model.set_value(cdt, cdn, 'rate',prate);
+// 						frappe.model.set_value(cdt, cdn, 'rate',prate);
 // 				}
 // 		});
 //     console.log(d);
@@ -41,7 +41,6 @@ frappe.ui.form.on('Process Definition', {
 
 frappe.ui.form.on('Process Item', {
 	yeild:function(frm) {
-		// your code here
 		frm.call({
 			method:'qtyupdate',
 			doc: frm.doc,
@@ -50,7 +49,16 @@ frappe.ui.form.on('Process Item', {
 })
 frappe.ui.form.on('Operation Cost', {
 	cost:function(frm) {
-		// your code here
+		frm.call({
+			method:'qtyupdate',
+			doc: frm.doc,
+		});
+	},
+	rate:function(frm, cdt, cdn) {
+		var d = locals[cdt][cdn];
+		if(frm.doc.process_type == 'Subcontracting'){
+			frappe.model.set_value(cdt, cdn, 'cost', (d.rate * frm.doc.materials_qty));
+		}
 		frm.call({
 			method:'qtyupdate',
 			doc: frm.doc,
@@ -59,7 +67,6 @@ frappe.ui.form.on('Operation Cost', {
 })
 frappe.ui.form.on('Process Item', {
 	rate:function(frm) {
-		// your code here
 		frm.call({
 			method:'qtyupdate',
 			doc: frm.doc,
@@ -68,7 +75,6 @@ frappe.ui.form.on('Process Item', {
 })
 frappe.ui.form.on('Process Item', {
 	quantity:function(frm) {
-		// your code here
 		frm.call({
 			method:'qtyupdate',
 			doc: frm.doc,
