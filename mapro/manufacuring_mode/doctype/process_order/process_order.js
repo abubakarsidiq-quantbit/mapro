@@ -11,17 +11,6 @@ frappe.ui.form.on("Process Item", "item", function(frm, cdt, cdn) {
 	});
 });
 
-// frappe.ui.form.on('Process Order', {
-// 	quantity: function(frm) {
-// 		frm.clear_table("operation_cost")
-// 		frm.refresh_field('operation_cost')
-// 		frm.call({
-// 			method:'upend_opcost_table',
-// 			doc: frm.doc,
-// 		});
-// 	}
-//   });
-
 
 frappe.ui.form.on("Process Order Item", {
     materials_update(frm){
@@ -68,21 +57,21 @@ frappe.ui.form.on('Process Order Item', {
 		});
 	}
 })
-  frappe.ui.form.on('Process Order', {
-	update_qty: function(frm) {
-		frm.call({
-			method:'qtyupdate',
-			doc: frm.doc,
-		});
-	}
-  });
-  frappe.ui.form.on('Process Order Item', {
-	rate:function(frm) {
-		frm.call({
-			method:'qtyupdate',
-			doc: frm.doc,
-		});
-	}
+frappe.ui.form.on('Process Order', {
+    update_qty: function(frm) {
+        frm.call({
+            method:'qtyupdate',
+            doc: frm.doc,
+        });
+    }
+});
+frappe.ui.form.on('Process Order Item', {
+    rate:function(frm) {
+        frm.call({
+            method:'qtyupdate',
+            doc: frm.doc,
+        });
+    }
 })
 frappe.ui.form.on('Process Order Item', {
 	yeild:function(frm) {
@@ -103,7 +92,7 @@ frappe.ui.form.on('Process Order Item', {
 // })
 
 
-  frappe.ui.form.on('Process Order', {
+frappe.ui.form.on('Process Order', {
 	job_offer:function(frm) {
         frm.clear_table("materials")
 		frm.refresh_field('materials')
@@ -122,7 +111,7 @@ frappe.ui.form.on('Process Order Item', {
 		// 	doc: frm.doc,
 		// });
 	}
-  });
+});
  
 
 frappe.ui.form.on('Process Order', {
@@ -147,7 +136,6 @@ frappe.ui.form.on('Process Order', {
         });
     },
     refresh: function (frm) {
-        
         if (!frm.doc.__islocal && frm.doc.status == 'Submitted' && frm.doc.subcontracting == 0) {
             var start_btn = frm.add_custom_button(__('Start'), function () {
                 prompt_for_qty(frm, "materials", "Enter Raw Material Quantity", true, function () {
@@ -208,16 +196,12 @@ frappe.ui.form.on('Process Order', {
     // }
 });
 var prompt_for_qty = function (frm, table, title, qty_required, callback) {
-    // if(table && !qty_required){
-    // 	callback();
-    // }
     let fields = []
     $.each(frm.doc[table] || [], function (i, row) {
         fields.push({
             fieldtype: "Float",
             label: __("{0} - {1}", [row.item, row.item_name]),
             fieldname: row.name
-            //value: row.quantity //value is ignored
         });
     })
     frappe.prompt(

@@ -4,6 +4,7 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import get_datetime, time_diff_in_hours
 from frappe import _
+from datetime import date
 class ProcessOrder(Document):
 	@frappe.whitelist()
 	def get_process_details(self):
@@ -19,7 +20,6 @@ class ProcessOrder(Document):
 				self.finished_products_qty = doc1.finished_products_qty
 				self.finished_products_amount = doc1.finished_products_amount
 				for d1 in doc1.get("materials"):
-					# tot_qty = tot_qty + self.
 					self.append("materials",{
 							"item_name":d1.item_name,
 							"item":d1.item,
@@ -27,7 +27,9 @@ class ProcessOrder(Document):
 							"rate":d1.rate,
 							"yeild":d1.yeild,
 							"amount":d1.amount,
-							"uom":d1.uom
+							"uom":d1.uom,
+							"warehouse": d1.warehouse,
+							"batch_no": d1.batch_no
 							}
 						)
 				for d2 in doc1.get("finished_products"):
@@ -38,9 +40,11 @@ class ProcessOrder(Document):
 							"rate":d2.rate,
 							"yeild":d2.yeild,
 							"amount":d2.amount,
-							"uom":d2.uom
-							}
-						)
+							"uom":d2.uom,
+							"warehouse": d2.warehouse,
+							"batch_no": d2.batch_no
+							})
+     
 				for d3 in doc1.get("scrap"):
 					self.append("scrap",{
 							"item":d3.item,
@@ -49,9 +53,11 @@ class ProcessOrder(Document):
 							"rate":d3.rate,
 							"yeild":d3.yeild,
 							"amount":d3.amount,
-							"uom":d3.uom
-							}
-						)
+							"uom":d3.uom,
+							"warehouse": d3.warehouse,
+							"batch_no": d3.batch_no
+							})
+    
 				for d4 in doc1.get("operation_cost"):
 					self.append("operation_cost",{
 							"operations":d4.operations,
@@ -61,46 +67,24 @@ class ProcessOrder(Document):
 						)
 				
      
-		# # Set costing_method
-		# self.costing_method = frappe.db.get_value("Process Definition", self.process_name, "costing_method")
-		# # Set Child Tables
-		# process = frappe.get_doc("Process Definition", self.process_name)
-		# # if process:
-		# # 	if process.materials:
-		# # 		self.add_item_in_table(process.materials, "materials")
-		# # 	if process.finished_products:
-		# # 		self.add_item_in_table(process.finished_products, "finished_products")
-		# # 	if process.scrap:
-		# # 		self.add_item_in_table(process.scrap, "scrap")
 	@frappe.whitelist()
 	def qtyupdate(self):
 		self.secondTrigger()
-		# self.secondTrigger()
 
 	@frappe.whitelist()
 	def secondTrigger(self):
 		temp=''
-		tocq=0.0
-		tbam=0.0
-  
 		for m in self.get('materials'):
 			temp=m.quantity
 			if m.quantity > 0:
 				m.quantity=(self.quantity * m.yeild) / 100
-			tbam=float(m.quantity)*float(m.rate)
-			m.amount=tbam
+			m.amount=float(m.quantity)*float(m.rate)
 			self.materials_qty = sum(m.quantity for m in self.get("materials"))
 			self.materials_amount = sum(m.amount for m in self.get("materials"))
 		for toc in self.get('operation_cost'):
-			# if(toc.is_check == 0):
-				# toc.cost=(float(self.quantity)*float(self.definition_material_qty))
-			# toc.cost=((float(toc.process_order_cost)/float(self.definition_material_qty)) * float(self.quantity))
 			if self.definition_material_qty:
 				toc.cost=((float(toc.process_order_cost)/float(self.definition_material_qty)) * float(self.quantity))
-				# toc.is_check  = '1'
-			# toc.cost = (toc.cost / self.definition_material_qty ) * self.quantity
-			tocq=float(tocq)+float(toc.cost)
-			self.total_operation_cost = sum(toc.cost for toc in self.get("operation_cost"))
+		self.total_operation_cost = sum(toc.cost for toc in self.get("operation_cost"))
    
 		for fp in self.get('finished_products'):
 			if fp.quantity >0:
@@ -108,58 +92,79 @@ class ProcessOrder(Document):
 				fp.quantity = (fp.yeild / 100) * self.materials_qty
 			tbam=float(fp.quantity)*float(fp.rate)
 			fp.amount=tbam
-			# fpam=float(fpam)+float(fp.amount)
-			# fpq=float(fpq)+float(fp.quantity)
-			pricelst = frappe.get_value("Manufacturing Rate Chart",{'process_type':self.process_type,"item_code":fp.item},"rate")
-			fp.manufacturing_rate = pricelst
-			if fp.manufacturing_rate == None:
-				fp.manufacturing_rate = 0
+			pricelst = frappe.get_all("Manufacturing Rate Chart",{'process_type':self.process_type,'item_code':fp.item,'from_date': ['<',date.today()]},"rate")
+			if len(pricelst)>=2:
+				frappe.throw(f"There Are Multiple Rate Chart For {fp.item} Item At Manufacturing Rate Chart.")
+			else:
+				if pricelst:
+					fp.manufacturing_rate = pricelst[0]['rate']
+					fp.sale_value = fp.quantity * fp.manufacturing_rate
+				else:
+					fp.manufacturing_rate = 0
+					fp.sale_value = 0
+					fp.basic_value = 0
 			if fp.quantity == None:
 				fp.quantity = 0
-			fp.sale_value = fp.quantity * fp.manufacturing_rate
-			# self.total_sale_value = sum(fp.sale_value for fp in self.get("finished_products"))
-			self.finished_products_qty = sum(fp.quantity for fp in self.get("finished_products"))
-			# self.finished_products_amount = sum(fp.amount for fp in self.get("finished_products"))
-			for sc in self.get('scrap'):
-				pricelst = frappe.get_value("Manufacturing Rate Chart",{'process_type':self.process_type,"item_code":sc.item},"rate")
-				if(pricelst):
-					sc.manufacturing_rate = pricelst
-				else:
-					sc.manufacturing_rate = 0
-				sc.sale_value = float(sc.quantity) * float(sc.manufacturing_rate)
-				self.scrap_qty = sum(sc.quantity for sc in self.get("scrap"))
-				self.scrap_amount = sum(sc.amount for sc in self.get("scrap"))
-				self.total_scrap_sale_value = sum(sc.sale_value for sc in self.get("scrap"))
-			if fp.sale_value >0 and (self.total_sale_value +self.total_scrap_sale_value):
-				fp.basic_value = (fp.sale_value / (self.total_sale_value +self.total_scrap_sale_value)) * (self.materials_amount)
-			# fp.basic_value = (fp.sale_value / (self.total_sale_value +self.total_scrap_sale_value)) * (self.materials_amount + self.total_operation_cost)
-			# if fp.basic_value >0:
-			# 	fp.rate = fp.basic_value / fp.quantity
-			# fp.amount = fp.rate * fp.quantity
-  
+		for sc in self.get('scrap'):
+			pricelst = frappe.get_value("Manufacturing Rate Chart",{'process_type':self.process_type,"item_code":sc.item},"rate")
+			if(pricelst):
+				sc.manufacturing_rate = pricelst
+			else:
+				sc.manufacturing_rate = 0
+			sc.sale_value = float(sc.quantity) * float(sc.manufacturing_rate)
+			
+		self.total_scrap_sale_value = sum(sc.sale_value for sc in self.get("scrap"))
+		self.total_sale_value = sum(fp.sale_value for fp in self.get("finished_products"))
+
 		for sc in self.get('scrap'):
 			if temp:
 				sc.quantity=str((int(sc.quantity)*int(self.quantity))/int(temp))
 			sc.quantity = (sc.yeild / 100) * self.materials_qty
-			tbam=float(sc.quantity)*float(sc.rate)
-			sc.amount=tbam
-			# scam=float(scam)+float(sc.amount)
-			# scq=float(scq)+float(sc.quantity)
-			# pricelst = frappe.get_value("Manufacturing Rate Chart",{'process_type':self.process_type,"item_code":sc.item},"rate")
-			# sc.manufacturing_rate = pricelst
-			# sc.sale_value = sc.quantity * sc.manufacturing_rate
-			# self.total_scrap_sale_value = sum(sc.sale_value for sc in self.get("scrap"))
-			# sc.basic_value = (sc.sale_value / (self.total_sale_value +self.total_scrap_sale_value)) * (self.materials_amount + self.total_operation_cost)
+			sc.amount=float(sc.quantity)*float(sc.rate)
+			
 			if sc.sale_value >0 and (self.total_sale_value +self.total_scrap_sale_value):
 				sc.basic_value = (sc.sale_value / (self.total_sale_value +self.total_scrap_sale_value)) * (self.materials_amount)
 			if sc.quantity:
 				sc.rate = sc.basic_value / sc.quantity
 			sc.amount = sc.rate * sc.quantity
 
-		
-		# self.scrap_qty=scq
-		# self.scrap_amount=scam
+		for fp in self.get('finished_products'):
+			if fp.sale_value >0 and (self.total_sale_value + self.total_scrap_sale_value):
+				fp.basic_value = (fp.sale_value / (self.total_sale_value +self.total_scrap_sale_value)) * (self.materials_amount)
+			else:
+				fp.basic_value = 0
+		total_basic_value = sum(fp.basic_value for fp in self.get("finished_products"))
+		total_scrap_basic_value = sum(fp.basic_value for fp in self.get("finished_products"))
+
+		for fp in self.get('finished_products'):
+			if total_basic_value:
+				fp.operation_cost = (fp.basic_value/total_basic_value) * self.total_operation_cost
+			else:
+				fp.operation_cost = 0 
+			fp.total_cost = fp.operation_cost + fp.basic_value
+			if fp.total_cost and fp.quantity:
+				fp.valuation_rate = fp.total_cost/fp.quantity
+				fp.amount = fp.valuation_rate * fp.quantity
+			else:
+				fp.valuation_rate = 0
+				fp.amount = 0
+		for fp in self.get('scrap'):
+			if total_scrap_basic_value:
+				fp.operation_cost = (fp.basic_value/total_scrap_basic_value) * self.total_operation_cost
+			else:
+				fp.operation_cost = 0 
+			fp.total_cost = fp.basic_value
+			if fp.total_cost and fp.quantity:
+				fp.valuation_rate = fp.total_cost/fp.quantity
+				fp.amount = fp.valuation_rate * fp.quantity
+			else:
+				fp.valuation_rate = 0
+				fp.amount = 0
+
+		self.finished_products_qty = sum(fp.quantity for fp in self.get("finished_products"))
 		self.finished_products_amount  = sum(fp.amount for fp in self.get("finished_products"))
+		self.scrap_qty = sum(sc.quantity for sc in self.get("scrap"))
+		self.scrap_amount = sum(sc.amount for sc in self.get("scrap"))
 		if self.scrap_qty or self.finished_products_qty:
 			self.all_finish_qty=self.finished_products_qty+ self.scrap_qty
 		else:
@@ -168,29 +173,25 @@ class ProcessOrder(Document):
 			self.total_all_amount=self.finished_products_amount+self.scrap_amount
 		else:
 			self.total_all_amount = 0
-  
-		# for toc in self.get('operation_cost'):
-		# 	toc.cost=str((int(toc.cost)*int(self.quantity))/int(temp))
-		# 	tocq=float(tocq)+float(toc.cost)
-		
-		self.total_operation_cost=tocq
+		self.materials_amount = sum(m.amount for m in self.get("materials"))
+		self.total_operation_cost = sum(toc.cost for toc in self.get("operation_cost"))
 		self.diff_qty=float(self.all_finish_qty)-float(self.materials_qty)
-		self.diff_amt=float(self.materials_amount+self.total_operation_cost)-float(self.total_all_amount)
+		self.diff_amt=float(self.total_all_amount) - float(self.materials_amount)
 
-		for ok in self.get('finished_products'):
-			if ok.amount >0 and self.total_all_amount:
-				ok.operation_cost = ( ok.amount / self.total_all_amount ) * self.total_operation_cost
-			else:
-				ok.operation_cost = 0
-			ok.total_cost = ok.amount + ok.operation_cost
-			if ok.total_cost>0:
-				ok.valuation_rate = ok.total_cost / ok.quantity
-		for yes in self.get('scrap'):
-			if yes.amount >0:
-				yes.operation_cost = ( yes.amount / self.total_all_amount ) * self.total_operation_cost
-			yes.total_cost = yes.amount + yes.operation_cost
-			if yes.total_cost>0:
-				yes.valuation_rate = yes.total_cost / yes.quantity
+		# for ok in self.get('finished_products'):
+		# 	if ok.amount >0 and self.total_all_amount:
+		# 		ok.operation_cost = ( ok.amount / self.total_all_amount ) * self.total_operation_cost
+		# 	else:
+		# 		ok.operation_cost = 0
+		# 	ok.total_cost = ok.amount + ok.operation_cost
+		# 	if ok.total_cost>0:
+		# 		ok.valuation_rate = ok.total_cost / ok.quantity
+		# for yes in self.get('scrap'):
+		# 	if yes.amount >0:
+		# 		yes.operation_cost = ( yes.amount / self.total_all_amount ) * self.total_operation_cost
+		# 	yes.total_cost = yes.amount + yes.operation_cost
+		# 	if yes.total_cost>0:
+		# 		yes.valuation_rate = yes.total_cost / yes.quantity
 
 	@frappe.whitelist()
 	def Get_Purchase_Rate(self,item,index):
@@ -201,6 +202,10 @@ class ProcessOrder(Document):
     
 	@frappe.whitelist()
 	def on_submit(self):
+		if not self.material_transfer_naming_series:
+			frappe.throw(_("Material Transfer is required before Submit"))
+		if not self.manufacturing_naming_series:
+			frappe.throw(_("Manufacturing is required before Submit"))
 		if not self.wip_warehouse:
 			frappe.throw(_("Work-in-Progress Warehouse is required before Submit"))
 		if not self.fg_warehouse:
@@ -242,6 +247,10 @@ class ProcessOrder(Document):
 
 	@frappe.whitelist()			
 	def start_finish_processing(self, status):
+		if not self.material_transfer_naming_series:
+			frappe.throw(_("Material Transfer Naming Series is required before Submit"))
+		if not self.manufacturing_naming_series:
+			frappe.throw(_("Manufacturing Naming Series is required before Submit"))
 		if status == "In Process":
 			if not self.end_dt:
 				self.end_dt = get_datetime()
@@ -314,9 +323,7 @@ class ProcessOrder(Document):
 							else:
 								frappe.throw(_("Selling price not set for item {0}").format(item.item))
 		else:
-			se_materials = frappe.get_doc("Proposed Stock Entry", {"process_order": self.name, "docstatus": '1'})
-			# get items to consume from previous stock entry or append to items
-			# TODO allow multiple raw material transfer
+			se_materials = frappe.get_doc("Proposed Stock Entry", {"batch_order": self.name, "docstatus": '1'})
 			raw_material_cost = 0
 			operating_cost = 0
 			if se_materials:
@@ -328,8 +335,6 @@ class ProcessOrder(Document):
 			else:
 				for item in self.materials:
 					se = self.set_se_items(se, item, se.from_warehouse, None, False)
-			# TODO calc raw_material_cost
-			# no timesheet entries, calculate operating cost based on workstation hourly rate and process start, end
 			hourly_rate = frappe.db.get_value("Workstation", self.workstation, "hour_rate")
 			if hourly_rate:
 				if self.operation_hours >= 0:
@@ -438,28 +443,28 @@ class ProcessOrder(Document):
 
 	@frappe.whitelist()	
 	def make_stock_entry(self, status):
+		if not self.material_transfer_naming_series:
+			frappe.throw(_("Material Transfer Naming Series is required before Submit"))
+		if not self.manufacturing_naming_series:
+			frappe.throw(_("Manufacturing Naming Series is required before Submit"))
 		if self.quantity > 0:
 			stock_entry = frappe.new_doc("Proposed Stock Entry")
-			stock_entry.process_order = self.name
+			stock_entry.batch_order = self.name
+			stock_entry.custom_job_offer = self.job_offer
+			stock_entry.process_definition = self.process_name
 
 			if status == "Submitted":
 				stock_entry.purpose = "Material Transfer for Manufacture"
+				stock_entry.naming_series = self.material_transfer_naming_series
 				stock_entry.stock_entry_type = "Material Transfer for Manufacture"
 				stock_entry = self.set_se_items_start(stock_entry)
-				frappe.throw(str(stock_entry))
-				for op in self.operation_cost:
-					stock_entry.append("additional_costs",{
-						'expense_account': op.operations,
-						'amount': op.cost,
-						'description': 'None'
-					})
-				stock_entry.total_additional_costs = sum(tot_op.cost for tot_op in self.operation_cost)
 				self.status = "In Process"
 				self.save()
 
 			if status == "In Process":
 				stock_entry.purpose = "Manufacture"
 				stock_entry.stock_entry_type = "Manufacture"
+				stock_entry.naming_series = self.manufacturing_naming_series
 				stock_entry = self.set_se_items_finish(stock_entry)
 				for op in self.operation_cost:
 					stock_entry.append("additional_costs",{

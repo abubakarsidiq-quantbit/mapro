@@ -22,9 +22,14 @@
   "column_break_xja5t",
   "department",
   "costing_method",
+  "section_break_a7lzz",
+  "material_transfer_naming_series",
+  "column_break_xq7ma",
+  "manufacturing_naming_series",
   "warehouses_section",
   "src_warehouse",
   "wip_warehouse",
+  "purchase_order",
   "column_break_13",
   "fg_warehouse",
   "scrap_warehouse",
@@ -51,14 +56,15 @@
   "total_sale_value",
   "scrap_section",
   "scrap",
-  "section_break_mfai4",
   "scrap_qty",
-  "all_finish_qty",
-  "column_break_sxcxu",
+  "section_break_mfai4",
+  "column_break_utad6",
   "scrap_amount",
+  "column_break_emqxe",
+  "all_finish_qty",
+  "column_break_0yeid",
   "total_all_amount",
   "section_break_41",
-  "column_break_41",
   "total_scrap_sale_value",
   "diff_qty",
   "column_break_43",
@@ -69,8 +75,8 @@
   "end_dt",
   "company",
   "operation_hours",
-  "amended_from",
-  "subcontracting"
+  "subcontracting",
+  "amended_from"
  ],
  "fields": [
   {
@@ -236,15 +242,6 @@
    "label": "Hours of Operation"
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Process Order",
-   "print_hide": 1,
-   "read_only": 1
-  },
-  {
    "allow_on_submit": 1,
    "fieldname": "materials_qty",
    "fieldtype": "Float",
@@ -295,18 +292,14 @@
    "allow_on_submit": 1,
    "fieldname": "scrap_qty",
    "fieldtype": "Float",
-   "label": "Total Qty ",
+   "label": "Scrap Qty",
    "precision": "2"
-  },
-  {
-   "fieldname": "column_break_sxcxu",
-   "fieldtype": "Column Break"
   },
   {
    "allow_on_submit": 1,
    "fieldname": "scrap_amount",
    "fieldtype": "Currency",
-   "label": "Total Amount",
+   "label": "Scrap Amount",
    "precision": "2"
   },
   {
@@ -351,10 +344,6 @@
    "fieldtype": "Currency",
    "label": "Total all amount",
    "precision": "2"
-  },
-  {
-   "fieldname": "column_break_41",
-   "fieldtype": "Column Break"
   },
   {
    "allow_on_submit": 1,
@@ -441,6 +430,55 @@
    "fieldtype": "Check",
    "label": "Subcontracting",
    "read_only": 1
+  },
+  {
+   "fetch_from": "job_offer.purchase_order",
+   "fieldname": "purchase_order",
+   "fieldtype": "Link",
+   "label": "Purchase Order",
+   "options": "Purchase Order"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Process Order",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "column_break_utad6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_emqxe",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_0yeid",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_a7lzz",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "material_transfer_naming_series",
+   "fieldtype": "Select",
+   "label": "Material Transfer Naming Series",
+   "options": "\nP-MAT-STE-.FY.-\nP-C/CUT/.FY./.##.\nP-C/PEELING/.FY./.##.\nP-C/WGRD/.FY./.###.\nP-C/SGRD/.FY./.###.\nP-C/RPS/.FY./.##.\nP-C/SRPS/.FY./.##.\nP-C/WRPS/.FY./.##.\nP-C/OPCUT/.FY./.##.\nP-C/OPGRD/.FY./.##.\nP-C/OPPEEL/.FY./.##.\nP-MAT-STE-.YYYY.-\nP-C/CUT/23-24/.##.\nP-C/PEELING/23-24/.##.\nP-C/WGRD/23-24/.###.\nP-C/SGRD/23-24/.###.\nP-C/RPS/23-24/.##.\nP-C/SRPS/23-24/.##.\nP-C/WRPS/23-24/.##.\nP-C/OPCUT/23-24/.##.\nP-C/OPGRD/23-24/.##.\nP-C/OPPEEL/23-24/.##."
+  },
+  {
+   "fieldname": "column_break_xq7ma",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "manufacturing_naming_series",
+   "fieldtype": "Select",
+   "label": "Manufacturing Naming Series",
+   "options": "\nP-MAT-STE-.FY.-\nP-C/CUT/.FY./.##.\nP-C/PEELING/.FY./.##.\nP-C/WGRD/.FY./.###.\nP-C/SGRD/.FY./.###.\nP-C/RPS/.FY./.##.\nP-C/SRPS/.FY./.##.\nP-C/WRPS/.FY./.##.\nP-C/OPCUT/.FY./.##.\nP-C/OPGRD/.FY./.##.\nP-C/OPPEEL/.FY./.##.\nP-MAT-STE-.YYYY.-\nP-C/CUT/23-24/.##.\nP-C/PEELING/23-24/.##.\nP-C/WGRD/23-24/.###.\nP-C/SGRD/23-24/.###.\nP-C/RPS/23-24/.##.\nP-C/SRPS/23-24/.##.\nP-C/WRPS/23-24/.##.\nP-C/OPCUT/23-24/.##.\nP-C/OPGRD/23-24/.##.\nP-C/OPPEEL/23-24/.##."
   }
  ],
  "index_web_pages_for_search": 1,
@@ -451,7 +489,7 @@
    "link_fieldname": "process_order"
   }
  ],
- "modified": "2024-08-01 12:33:25.525292",
+ "modified": "2024-10-17 17:24:34.584707",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Process Order",

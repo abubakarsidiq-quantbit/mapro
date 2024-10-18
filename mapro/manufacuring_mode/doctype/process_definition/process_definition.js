@@ -28,8 +28,6 @@
 // })
 
 frappe.ui.form.on('Process Definition', {
-	refresh: function(frm) {
-	},
 	setup: function (frm) {
 		frm.set_query("workstation", function () {
 			return {
@@ -39,48 +37,59 @@ frappe.ui.form.on('Process Definition', {
 	}
 });
 
-frappe.ui.form.on('Process Item', {
-	yeild:function(frm) {
-		frm.call({
-			method:'qtyupdate',
-			doc: frm.doc,
-		});
-	}
-})
 frappe.ui.form.on('Operation Cost', {
-	cost:function(frm) {
-		frm.call({
-			method:'qtyupdate',
-			doc: frm.doc,
-		});
-	},
 	rate:function(frm, cdt, cdn) {
 		var d = locals[cdt][cdn];
 		if(frm.doc.process_type == 'Subcontracting'){
 			frappe.model.set_value(cdt, cdn, 'cost', (d.rate * frm.doc.materials_qty));
 		}
-		frm.call({
-			method:'qtyupdate',
-			doc: frm.doc,
-		});
 	}
 })
+
 frappe.ui.form.on('Process Item', {
-	rate:function(frm) {
-		frm.call({
-			method:'qtyupdate',
-			doc: frm.doc,
-		});
+	batch_no: function(frm, cdt, cdn){
+		var d = locals[cdt][cdn];
+		if(d.warehouse && d.item && frm.doc.date){
+			frappe.call({
+				method: 'mapro.manufacuring_mode.doctype.process_definition.process_definition.get_batch_rate',
+				args: {
+					doc: frm.doc,
+					item: d.item,
+					warehouse: d.warehouse,
+					batch_no: d.batch_no,
+					date: frm.doc.date
+				},
+				callback: function(r){
+					frappe.model.set_value(cdt, cdn, 'rate', r.message);
+					frappe.model.set_value(cdt, cdn, 'amount', (r.message * d.quantity));
+				}
+			});
+		}
+		// else{
+		// 	frappe.throw("Check Item, Warehouse, Date is Set.")
+		// }
+    },
+	quantity: function(frm, cdt, cdn){
+		var d = locals[cdt][cdn];
+		frappe.model.set_value(cdt, cdn, 'amount', (d.rate * d.quantity));
 	}
 })
-frappe.ui.form.on('Process Item', {
-	quantity:function(frm) {
-		frm.call({
-			method:'qtyupdate',
-			doc: frm.doc,
-		});
+
+
+frappe.ui.form.on('Process Definition', {
+	// before_save:function(frm) {
+	// 	frm.call({
+	// 		method:'qtyupdate',
+	// 		doc: frm.doc,
+	// 	});
+	// },
+	setup: function (frm) {
+        frm.set_query("operations", "operation_cost", function (doc, cdt, cdn) {
+            return {
+                filters: [['Account', 'company', '=', frm.doc.company],
+						  ['Account', 'account_type', '=', 'Expenses Included In Valuation'],
+						  ['Account', 'is_group', '=', 0]]
+            };
+        });
 	}
 })
-
-
-

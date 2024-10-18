@@ -14,6 +14,7 @@
   "workstation",
   "process_type",
   "costing_method",
+  "purchase_order",
   "column_break_5",
   "date",
   "department",
@@ -384,6 +385,12 @@
    "label": "Definition Material QTY",
    "precision": "2",
    "read_only": 1
+  },
+  {
+   "fieldname": "purchase_order",
+   "fieldtype": "Link",
+   "label": "Purchase Order",
+   "options": "Purchase Order"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -398,7 +405,7 @@
    "link_fieldname": "custom_job_offer"
   }
  ],
- "modified": "2024-06-10 13:29:43.700890",
+ "modified": "2024-10-05 14:09:41.651188",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Job Offer Process",
