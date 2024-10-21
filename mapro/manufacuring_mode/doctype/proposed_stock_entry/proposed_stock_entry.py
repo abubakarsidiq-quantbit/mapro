@@ -6,7 +6,6 @@ import json
 from collections import defaultdict
 from frappe.model.document import Document
 from frappe.utils import cint, comma_or, cstr, flt, format_time, formatdate, getdate, nowdate
-
 import erpnext
 from erpnext.accounts.general_ledger import process_gl_map
 from erpnext.controllers.taxes_and_totals import init_landed_taxes_and_totals
