@@ -95,7 +95,8 @@
   "credit_note",
   "is_return",
   "amended_from",
-  "cost_center"
+  "cost_center",
+  "process_order"
  ],
  "fields": [
   {
@@ -756,6 +757,12 @@
    "fieldtype": "Link",
    "label": "Process_Definition",
    "options": "Process Definition"
+  },
+  {
+   "fieldname": "process_order",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "process_order"
   }
  ],
  "icon": "fa fa-file-text",
@@ -767,7 +774,7 @@
    "link_fieldname": "custom_proposed_stock_entry"
   }
  ],
- "modified": "2024-08-13 09:53:19.265145",
+ "modified": "2024-10-23 12:54:21.795157",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Proposed Stock Entry",
