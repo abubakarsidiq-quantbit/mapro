@@ -5,7 +5,7 @@ frappe.provide("erpnext.accounts.dimensions");
 
 {% include 'erpnext/stock/landed_taxes_and_charges_common.js' %};
 
-frappe.ui.form.on('Stock Entry', {
+frappe.ui.form.on('Proposed Stock Entry', {
 	before_save(frm){
 		frm.call	({
 			method:"valcal",
@@ -15,7 +15,7 @@ frappe.ui.form.on('Stock Entry', {
 	}
 });
 
-frappe.ui.form.on('Stock Entry', {
+frappe.ui.form.on('Proposed Stock Entry', {
 	after_save(frm){
 		frm.call	({
 			method:"aftersave",
@@ -26,7 +26,7 @@ frappe.ui.form.on('Stock Entry', {
 });
 
 
-frappe.ui.form.on('Stock Entry', {
+frappe.ui.form.on('Proposed Stock Entry', {
 	upend_trigger(frm){
 		frm.call	({
 			method:"YeildValue",
@@ -36,7 +36,7 @@ frappe.ui.form.on('Stock Entry', {
 });
 
 
-frappe.ui.form.on('Stock Entry', {
+frappe.ui.form.on('Proposed Stock Entry', {
 	upend_trigger(frm){
 	   // frm.fields_dict.upend_trigger.$wrapper.hide();
 		frm.clear_table("additional_costs")
@@ -48,7 +48,7 @@ frappe.ui.form.on('Stock Entry', {
 	}
 });
 
-frappe.ui.form.on('Stock Entry', {
+frappe.ui.form.on('Proposed Stock Entry', {
 	setup: function(frm) {
 		frm.set_indicator_formatter('item_code', function(doc) {
 			if (!doc.s_warehouse) {
@@ -71,8 +71,8 @@ frappe.ui.form.on('Stock Entry', {
 		frm.set_query('outgoing_stock_entry', function() {
 			return {
 				filters: [
-					['Stock Entry', 'docstatus', '=', 1],
-					['Stock Entry', 'per_transferred', '<','100'],
+					['Proposed Stock Entry', 'docstatus', '=', 1],
+					['Proposed Stock Entry', 'per_transferred', '<','100'],
 				]
 			}
 		});
@@ -252,7 +252,7 @@ frappe.ui.form.on('Stock Entry', {
 						frm: frm,
 						child_docname: "items",
 						warehouse_field: "s_warehouse",
-						child_doctype: "Stock Entry Detail",
+						child_doctype: "Proposed Stock Entry Detail",
 						original_item_field: "original_item",
 						condition: (d) => {
 							if (d.s_warehouse && d.allow_alternative_item) {return true;}
@@ -279,7 +279,7 @@ frappe.ui.form.on('Stock Entry', {
 						'docstatus': ['!=', 2]
 					};
 
-					frappe.set_route('List', 'Stock Entry');
+					frappe.set_route('List', 'Proposed Stock Entry');
 				}, __("View"));
 			}
 		}
@@ -369,7 +369,7 @@ frappe.ui.form.on('Stock Entry', {
 		}
 
 		if(frm.doc.docstatus==1 && frm.doc.purpose == "Material Receipt" && frm.get_sum('items', 			'sample_quantity')) {
-			frm.add_custom_button(__('Create Sample Retention Stock Entry'), function () {
+			frm.add_custom_button(__('Create Sample Retention Proposed Stock Entry'), function () {
 				frm.trigger("make_retention_stock_entry");
 			});
 		}
@@ -396,7 +396,7 @@ frappe.ui.form.on('Stock Entry', {
 			frm.add_custom_button(__('Transit Entry'), function() {
 				erpnext.utils.map_current_doc({
 					method: "erpnext.stock.doctype.stock_entry.stock_entry.make_stock_in_entry",
-					source_doctype: "Stock Entry",
+					source_doctype: "Proposed Stock Entry",
 					target: frm,
 					date_field: "posting_date",
 					setters: {
@@ -494,7 +494,7 @@ frappe.ui.form.on('Stock Entry', {
 					frappe.set_route("Form", doc.doctype, doc.name);
 				}
 				else {
-					frappe.msgprint(__("Retention Stock Entry already created or Sample Quantity not provided"));
+					frappe.msgprint(__("Retention Proposed Stock Entry already created or Sample Quantity not provided"));
 				}
 			}
 		});
@@ -632,7 +632,7 @@ frappe.ui.form.on('Stock Entry', {
 					} else {
 						erpnext.utils.remove_empty_first_row(frm, "items");
 						$.each(r.message, function(i, item) {
-							let d = frappe.model.add_child(cur_frm.doc, "Stock Entry Detail", "items");
+							let d = frappe.model.add_child(cur_frm.doc, "Proposed Stock Entry Detail", "items");
 							d.item_code = item.item_code;
 							d.item_name = item.item_name;
 							d.item_group = item.item_group;
@@ -757,7 +757,7 @@ frappe.ui.form.on('Stock Entry', {
 	}
 });
 
-frappe.ui.form.on('Stock Entry Detail', {
+frappe.ui.form.on('Proposed Stock Entry Detail', {
 	qty: function(frm, cdt, cdn) {
 		frm.events.set_serial_no(frm, cdt, cdn, () => {
 			frm.events.set_basic_rate(frm, cdt, cdn);

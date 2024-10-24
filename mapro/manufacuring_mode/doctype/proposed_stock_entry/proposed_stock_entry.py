@@ -1396,3 +1396,113 @@ def validate_uom_is_integer(doc, uom_field, qty_fields, child_dt=None):
 # 	doc.save()
 # 	doc.submit()
 # 	frappe.msgprint("Manufacture entry successfully inserted")
+
+
+# STOCK ENTRY CUSTOM CODE
+# @frappe.whitelist()
+# def opcost(self):
+# 	if self.purpose == 'Manufacture':
+# 		doc=frappe.db.get_all('Process Order',filters={'name':self.process_order})
+# 		for d in doc:
+# 			doc1=frappe.get_doc('Process Order',d.name)
+# 			self.total_additional_costs = doc1.total_operation_cost
+# 			for d1 in doc1.get("operation_cost"):
+# 				self.append("additional_costs",{
+# 						"expense_account":d1.operations,
+# 						"amount":d1.cost,
+# 						"description":"None",
+# 						"base_amount":d1.cost,
+# 						}
+# 					)
+# 			for d2 in doc1.get("finished_products"):
+# 				for d3 in self.get("items", filters = {'item_code':d2.item}):
+# 					d3.basic_amt_cal = d2.rate
+# 					d3.basic_rate = d2.rate
+# 					d3.yielding = d2.yeild
+# 					d3.batch_no = d2.batch_no
+# 					d3.set_basic_rate_manually = "1"
+# 					d3.is_finished_item = "1"
+# 					d3.basic_amount = d3.qty * d3.basic_rate
+# 					d3.t_warehouse = d2.warehouse
+# 					pricelst = frappe.get_value("Manufacturing Rate Chart",{"item_code":d3.item_code},"rate")
+# 					d3.custom_price_list_rate = pricelst
+# 					d3.custom_sale_value = d3.custom_price_list_rate * d3.qty
+
+						
+# 			for d4 in doc1.get("scrap"):
+# 				for d5 in self.get("items", filters = {'item_code':d4.item}):
+# 						d5.basic_rate = d4.rate
+# 						d5.basic_amt_cal = d4.rate
+# 						d5.yielding = d4.yeild
+# 						d3.batch_no = d4.batch_no
+# 						d5.set_basic_rate_manually = "1"
+# 						d5.is_finished_item = "1"
+# 						d5.basic_amount = d5.qty * d5.basic_rate
+# 						d5.t_warehouse = d4.warehouse
+# 						pricelst = frappe.get_value("Manufacturing Rate Chart",{"item_code":d5.item_code},"rate")
+# 						d5.custom_price_list_rate = pricelst
+# 						d5.custom_sale_value = d5.custom_price_list_rate * d5.qty
+
+# @frappe.whitelist()
+# def valcal(self):
+# 	if self.purpose == 'Manufacture':
+# 		totsaleval = 0
+# 		doc=frappe.db.get_all('Process Order',filters={'name':self.process_order})
+# 		rawitemprice = sum(totall.amount  for totall in self.get("items") if totall.t_warehouse == None)
+# 		totsaleval = sum(j.custom_sale_value for j in self.get("items") if j.t_warehouse != None)
+# 		addcost = sum(addco.amount for addco in self.get("additional_costs"))
+# 		for d6 in self.get("items"):
+# 			if(d6.s_warehouse == None):
+# 				d6.custom_basic_value = (d6.custom_sale_value / totsaleval) * float(rawitemprice)
+# 				d6.additional_cost = ((d6.custom_sale_value) / totsaleval) * addcost
+# 				d6.basic_rate = d6.custom_basic_value / d6.qty
+
+# @frappe.whitelist()
+# def aftersave(self):
+# 	if self.purpose == 'Manufacture':
+# 		for df in self.get("items"):
+# 			if(df.s_warehouse == None):
+# 				df.amount = df.basic_rate * df.qty + df.additional_cost
+# 	self.save()
+				
+# @frappe.whitelist()
+# def YeildValue(self,doctype):
+# 	if self.stock_entry_type == 'Manufacture':
+# 		self.total_additional_costs = sum(mk.amount for mk in self.get("additional_costs"))
+# 		tarWarQty = 0	
+# 		# z = 0		
+# 		for m in self.get('items'):
+# 			if str(m.t_warehouse) == 'None'or str(m.t_warehouse) == "":
+# 				tarWarQty +=(m.qty)
+# 		for s in self.get('items'):		
+# 			if str(s.s_warehouse) == 'None':
+# 				s.is_finished_item = "1"
+# 				s.yielding = str((float(s.qty) / float(tarWarQty)) * 100)
+# 			z = int(s.basic_rate)
+# 			if str(s.yielding) == "None":
+# 				s.basic_amt_cal = '0'
+# 			else:
+# 				pass
+# 	else:
+# 		pass
+
+
+# @frappe.whitelist()
+# def diffqty(self):
+# 	if self.stock_entry_type == 'Manufacture':
+# 		tqdif = float(0)
+# 		sqdiff = float(0)
+# 		for s in self.get('items'):
+# 			t_warehouse_str = str(s.t_warehouse)
+# 			s_warehouse_str = str(s.s_warehouse)
+# 			if t_warehouse_str == "None" or t_warehouse_str == "":
+# 				tqdif += s.qty
+# 			if s_warehouse_str == "None" or s_warehouse_str == "":
+# 				sqdiff += s.qty
+# 		self.custom_quantity_difference_ = tqdif - sqdiff
+# 		opp =0
+# 		for s in self.get('items'):
+# 			t_warehouse_str = str(s.t_warehouse)
+# 			if t_warehouse_str == "None" or t_warehouse_str == "" :
+# 				opp += s.qty
+# 		self.custom_in_qty_kg = self.total_additional_costs / float(opp)
