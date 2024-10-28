@@ -93,16 +93,16 @@ class ProcessOrder(Document):
 			tbam=float(fp.quantity)*float(fp.rate)
 			fp.amount=tbam
 			pricelst = frappe.get_all("Manufacturing Rate Chart",{'process_type':self.process_type,'item_code':fp.item,'from_date': ['<',date.today()]},"rate")
-			if len(pricelst)>=2:
-				frappe.throw(f"There Are Multiple Rate Chart For {fp.item} Item At Manufacturing Rate Chart.")
+			# if len(pricelst)>=2:
+			# 	frappe.throw(f"There Are Multiple Rate Chart For {fp.item} Item At Manufacturing Rate Chart.")
+			# else:
+			if pricelst:
+				fp.manufacturing_rate = pricelst[0]['rate']
+				fp.sale_value = fp.quantity * fp.manufacturing_rate
 			else:
-				if pricelst:
-					fp.manufacturing_rate = pricelst[0]['rate']
-					fp.sale_value = fp.quantity * fp.manufacturing_rate
-				else:
-					fp.manufacturing_rate = 0
-					fp.sale_value = 0
-					fp.basic_value = 0
+				fp.manufacturing_rate = 0
+				fp.sale_value = 0
+				fp.basic_value = 0
 			if fp.quantity == None:
 				fp.quantity = 0
 		for sc in self.get('scrap'):
