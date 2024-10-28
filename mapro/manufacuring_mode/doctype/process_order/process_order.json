@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_rename": 1,
  "autoname": "naming_series:",
  "creation": "2023-01-04 14:16:15.435986",
  "default_view": "List",
@@ -489,7 +488,7 @@
    "link_fieldname": "process_order"
   }
  ],
- "modified": "2024-10-17 17:24:34.584707",
+ "modified": "2024-10-25 14:23:44.282767",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Process Order",

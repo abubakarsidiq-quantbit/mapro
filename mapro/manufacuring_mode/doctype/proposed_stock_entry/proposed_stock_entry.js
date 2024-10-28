@@ -5,48 +5,47 @@ frappe.provide("erpnext.accounts.dimensions");
 
 {% include 'erpnext/stock/landed_taxes_and_charges_common.js' %};
 
-frappe.ui.form.on('Proposed Stock Entry', {
-	before_save(frm){
-		frm.call	({
-			method:"valcal",
-			doc:frm.doc,
-		})
+// frappe.ui.form.on('Proposed Stock Entry', {
+// 	before_save(frm){
+// 		frm.call	({
+// 			method:"valcal",
+// 			doc:frm.doc,
+// 		})
 
-	}
-});
+// 	}
+// });
 
-frappe.ui.form.on('Proposed Stock Entry', {
-	after_save(frm){
-		frm.call	({
-			method:"aftersave",
-			doc:frm.doc,
-		})
+// frappe.ui.form.on('Proposed Stock Entry', {
+// 	after_save(frm){
+// 		frm.call	({
+// 			method:"aftersave",
+// 			doc:frm.doc,
+// 		})
 
-	}
-});
-
-
-frappe.ui.form.on('Proposed Stock Entry', {
-	upend_trigger(frm){
-		frm.call	({
-			method:"YeildValue",
-			doc:frm.doc,
-		})
-	}
-});
+// 	}
+// });
 
 
-frappe.ui.form.on('Proposed Stock Entry', {
-	upend_trigger(frm){
-	   // frm.fields_dict.upend_trigger.$wrapper.hide();
-		frm.clear_table("additional_costs")
-		frm.refresh_field("additional_costs")
-		frm.call	({
-			method:"opcost",
-			doc:frm.doc,
-		})
-	}
-});
+// frappe.ui.form.on('Proposed Stock Entry', {
+// 	upend_trigger(frm){
+// 		frm.call	({
+// 			method:"YeildValue",
+// 			doc:frm.doc,
+// 		})
+// 	}
+// });
+
+
+// frappe.ui.form.on('Proposed Stock Entry', {
+// 	upend_trigger(frm){
+// 		frm.clear_table("additional_costs")
+// 		frm.refresh_field("additional_costs")
+// 		frm.call	({
+// 			method:"opcost",
+// 			doc:frm.doc,
+// 		})
+// 	}
+// });
 
 frappe.ui.form.on('Proposed Stock Entry', {
 	setup: function(frm) {
@@ -252,7 +251,7 @@ frappe.ui.form.on('Proposed Stock Entry', {
 						frm: frm,
 						child_docname: "items",
 						warehouse_field: "s_warehouse",
-						child_doctype: "Proposed Stock Entry Detail",
+						child_doctype: "Proposed Stock Entry Details",
 						original_item_field: "original_item",
 						condition: (d) => {
 							if (d.s_warehouse && d.allow_alternative_item) {return true;}
@@ -632,7 +631,7 @@ frappe.ui.form.on('Proposed Stock Entry', {
 					} else {
 						erpnext.utils.remove_empty_first_row(frm, "items");
 						$.each(r.message, function(i, item) {
-							let d = frappe.model.add_child(cur_frm.doc, "Proposed Stock Entry Detail", "items");
+							let d = frappe.model.add_child(cur_frm.doc, "Proposed Stock Entry Details", "items");
 							d.item_code = item.item_code;
 							d.item_name = item.item_name;
 							d.item_group = item.item_group;
@@ -757,7 +756,7 @@ frappe.ui.form.on('Proposed Stock Entry', {
 	}
 });
 
-frappe.ui.form.on('Proposed Stock Entry Detail', {
+frappe.ui.form.on('Proposed Stock Entry Details', {
 	qty: function(frm, cdt, cdn) {
 		frm.events.set_serial_no(frm, cdt, cdn, () => {
 			frm.events.set_basic_rate(frm, cdt, cdn);

@@ -43,7 +43,7 @@ class FinishedGoodError(frappe.ValidationError):
 	pass
 
 class ProposedStockEntry(StockController):
-	def before_submit(self):
+	def on_submit(self):
 		po = frappe.get_doc("Process Order",self.batch_order)
 		if self.stock_entry_type == "Material Transfer for Manufacture":
 			stock_entry = frappe.new_doc("Stock Entry")
@@ -107,7 +107,7 @@ class ProposedStockEntry(StockController):
 								"item_code": self.items[0].item_code,
 								"qty": ((self.items[0].qty)/(po.finished_products_qty))*self.items[d].qty,
 								"uom": self.items[0].uom,
-								"s_warehouse": po.fg_warehouse,
+								"s_warehouse": self.items[0].s_warehouse,
 								"batch_no": self.items[0].batch_no,
 								"cost_center": self.items[0].cost_center
 							},
@@ -191,8 +191,6 @@ class ProposedStockEntry(StockController):
 		self.validate_putaway_capacity()
 
 		if not self.get("purpose") == "Manufacture":
-			# ignore scrap item wh difference and empty source/target wh
-			# in Manufacture Entry
 			self.reset_default_field_value("from_warehouse", "items", "s_warehouse")
 			self.reset_default_field_value("to_warehouse", "items", "t_warehouse")
    
@@ -515,7 +513,7 @@ class ProposedStockEntry(StockController):
 			material_request_item = item.material_request_item or None
 			if self.purpose == "Material Transfer" and self.outgoing_stock_entry:
 				parent_se = frappe.get_value(
-					"Stock Entry Detail",
+					"Proposed Stock Entry Details",
 					item.ste_detail,
 					["material_request", "material_request_item"],
 					as_dict=True,
@@ -575,7 +573,7 @@ class ProposedStockEntry(StockController):
 		if not fg_qty:
 			return
 
-		precision = frappe.get_precision("Stock Entry Detail", "qty")
+		precision = frappe.get_precision("Proposed Stock Entry Details", "qty")
 		fg_item = next(iter(fg_qty.keys()))
 		fg_item_qty = flt(fg_qty[fg_item], precision)
 		fg_completed_qty = flt(self.fg_completed_qty, precision)
@@ -793,7 +791,7 @@ class ProposedStockEntry(StockController):
 							"""
 									select
 										sum(sed.qty) as qty
-									from `tabStock Entry` se,`tabStock Entry Detail` sed
+									from `tabStock Entry` se,`tabProposed Stock Entry Details` sed
 									where
 										se.name = sed.parent and se.docstatus=1 and
 										(se.purpose='Material Transfer for Manufacture' or se.purpose='Manufacture')
