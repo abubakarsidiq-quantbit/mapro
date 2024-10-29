@@ -142,6 +142,17 @@ class ProposedStockEntry(StockController):
 					stock_entry.save()
 					stock_entry.submit()
 
+	def before_save(self):
+		qty_sr, qty_tr = 0, 0
+		for itm in self.items:
+			if itm.s_warehouse:
+				qty_sr += itm.qty
+			if itm.t_warehouse:
+				qty_tr += itm.qty
+		self.custom_quantity_difference_ = qty_sr - qty_tr
+		if qty_sr > 0:
+			self.custom_in_qty_kg  = self.total_additional_costs / qty_sr
+
 	def validate(self):
 		self.pro_doc = frappe._dict()
 		if self.work_order:

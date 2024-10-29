@@ -715,6 +715,7 @@
   {
    "fieldname": "total_difference_",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Total Difference"
   },
   {
@@ -729,7 +730,7 @@
   {
    "fieldname": "custom_in_qty_kg",
    "fieldtype": "Float",
-   "label": "Cost / Kg on In Qty."
+   "label": "Operation Cost Per Kg"
   },
   {
    "fieldname": "column_break_zqekb",
@@ -738,11 +739,13 @@
   {
    "fieldname": "custom_diff_calculation",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Diff Calculation"
   },
   {
    "fieldname": "calculate_difference",
    "fieldtype": "Float",
+   "hidden": 1,
    "label": "Calculate Difference"
   },
   {
@@ -774,7 +777,7 @@
    "link_fieldname": "custom_proposed_stock_entry"
   }
  ],
- "modified": "2024-10-23 12:54:21.795157",
+ "modified": "2024-10-29 17:20:35.662077",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Proposed Stock Entry",
