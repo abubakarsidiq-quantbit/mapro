@@ -48,6 +48,16 @@ frappe.provide("erpnext.accounts.dimensions");
 // });
 
 frappe.ui.form.on('Proposed Stock Entry', {
+	calculate_difference(frm){
+		frm.refresh_field("custom_quantity_difference_")
+		frm.call	({
+			method:"diffqty",
+			doc:frm.doc,
+		})
+	}
+});
+
+frappe.ui.form.on('Proposed Stock Entry', {
 	setup: function(frm) {
 		frm.set_indicator_formatter('item_code', function(doc) {
 			if (!doc.s_warehouse) {

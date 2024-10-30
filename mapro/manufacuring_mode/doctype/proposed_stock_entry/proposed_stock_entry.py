@@ -142,16 +142,36 @@ class ProposedStockEntry(StockController):
 					stock_entry.save()
 					stock_entry.submit()
 
-	def before_save(self):
-		qty_sr, qty_tr = 0, 0
-		for itm in self.items:
-			if itm.s_warehouse:
-				qty_sr += itm.qty
-			if itm.t_warehouse:
-				qty_tr += itm.qty
-		self.custom_quantity_difference_ = qty_sr - qty_tr
-		if qty_sr > 0:
-			self.custom_in_qty_kg  = self.total_additional_costs / qty_sr
+	# def before_save(self):
+	# 	qty_sr, qty_tr = 0, 0
+	# 	for itm in self.items:
+	# 		if itm.s_warehouse:
+	# 			qty_sr += itm.qty
+	# 		if itm.t_warehouse:
+	# 			qty_tr += itm.qty
+	# 	self.custom_quantity_difference_ = qty_sr - qty_tr
+	# 	if qty_sr > 0:
+	# 		self.custom_in_qty_kg  = self.total_additional_costs / qty_sr
+
+	@frappe.whitelist()
+	def diffqty(self):
+		if self.stock_entry_type == 'Manufacture':
+			tqdif = float(0)
+			sqdiff = float(0)
+			for s in self.get('items'):
+				t_warehouse_str = str(s.t_warehouse)
+				s_warehouse_str = str(s.s_warehouse)
+				if t_warehouse_str == "None" or t_warehouse_str == "":
+					tqdif += s.qty
+				if s_warehouse_str == "None" or s_warehouse_str == "":
+					sqdiff += s.qty
+			self.custom_quantity_difference_ = tqdif - sqdiff
+			opp =0
+			for s in self.get('items'):
+				t_warehouse_str = str(s.t_warehouse)
+				if t_warehouse_str == "None" or t_warehouse_str == "" :
+					opp += s.qty
+			self.custom_in_qty_kg = self.total_additional_costs / float(opp)
 
 	def validate(self):
 		self.pro_doc = frappe._dict()
