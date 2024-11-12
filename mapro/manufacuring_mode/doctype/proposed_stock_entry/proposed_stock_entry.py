@@ -52,6 +52,7 @@ class ProposedStockEntry(StockController):
 			stock_entry.purpose = "Material Transfer for Manufacture"
 			stock_entry.stock_entry_type = "Material Transfer for Manufacture"
 			stock_entry.process_order = self.custom_job_offer
+			stock_entry.custom_job_offer = self.batch_order
 			stock_entry.from_warehouse = po.src_warehouse
 			stock_entry.to_warehouse = po.fg_warehouse
 			for se in self.items:
@@ -62,6 +63,7 @@ class ProposedStockEntry(StockController):
 					'qty': se.qty,
 					'item_code': se.item_code,
 					'uom': se.uom,
+					'batch_no': se.batch_no,
 					'stock_uom': se.stock_uom,
 					'expense_account': se.expense_account,
 					'cost_center': se.cost_center,
