@@ -47,6 +47,8 @@ class ProposedStockEntry(StockController):
 		po = frappe.get_doc("Process Order",self.batch_order)
 		if self.stock_entry_type == "Material Transfer for Manufacture":
 			stock_entry = frappe.new_doc("Stock Entry")
+			stock_entry.posting_date = self.posting_date
+			stock_entry.posting_time = self.posting_time
 			stock_entry.naming_series = '-'.join(self.naming_series.split('-')[1:])
 			stock_entry.custom_proposed_stock_entry = self.name
 			stock_entry.purpose = "Material Transfer for Manufacture"
@@ -97,6 +99,8 @@ class ProposedStockEntry(StockController):
 				tot_qty += self.items[i].qty
 			for d in range(1,len(self.items)):
 				stock_entry = frappe.new_doc("Stock Entry")
+				stock_entry.posting_date = self.posting_date
+				stock_entry.posting_time = self.posting_time
 				stock_entry.naming_series = '-'.join(self.naming_series.split('-')[1:])
 				stock_entry.custom_proposed_stock_entry = self.name
 				stock_entry.purpose = "Manufacture"
