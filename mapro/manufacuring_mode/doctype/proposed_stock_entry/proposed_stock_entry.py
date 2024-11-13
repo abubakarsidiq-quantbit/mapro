@@ -44,9 +44,10 @@ class FinishedGoodError(frappe.ValidationError):
 
 class ProposedStockEntry(StockController):
 	def on_submit(self):
-		po = frappe.get_doc("Process Order",self.batch_order)
+		po = frappe.get_doc("Process Order", self.batch_order)
 		if self.stock_entry_type == "Material Transfer for Manufacture":
 			stock_entry = frappe.new_doc("Stock Entry")
+			stock_entry.set_posting_time = True  
 			stock_entry.posting_date = self.posting_date
 			stock_entry.posting_time = self.posting_time
 			stock_entry.naming_series = '-'.join(self.naming_series.split('-')[1:])
@@ -58,7 +59,7 @@ class ProposedStockEntry(StockController):
 			stock_entry.from_warehouse = po.src_warehouse
 			stock_entry.to_warehouse = po.fg_warehouse
 			for se in self.items:
-				stock_entry.append("items",{
+				stock_entry.append("items", {
 					's_warehouse': se.s_warehouse,
 					't_warehouse': se.t_warehouse,
 					'item_name': se.item_name,
@@ -73,80 +74,75 @@ class ProposedStockEntry(StockController):
 					'conversion_factor': 1.00,
 					'cost_center': self.cost_center
 				})
-			
 			stock_entry.total_outgoing_value = self.total_outgoing_value
 			stock_entry.total_difference_ = self.total_difference_
 			stock_entry.total_incoming_value = self.total_incoming_value
 			stock_entry.value_difference = self.value_difference
 			stock_entry.custom_quantity_difference_ = self.custom_quantity_difference_
 			stock_entry.custom_in_qty_kg = self.custom_in_qty_kg
-
 			for op in self.additional_costs:
-				stock_entry.append("additional_costs",{
+				stock_entry.append("additional_costs", {
 					'expense_account': op.expense_account,
 					'amount': op.amount,
 					'description': 'None'
 				})
 			stock_entry.cost_center = self.cost_center
 			stock_entry.total_additional_costs = sum(tot_op.amount for tot_op in self.additional_costs)
+
 			stock_entry.insert()
 			stock_entry.save()
 			stock_entry.submit()
 
 		if self.stock_entry_type == "Manufacture":
 			tot_qty = 0
-			for i in range(1,len(self.items)):
+			for i in range(1, len(self.items)):
 				tot_qty += self.items[i].qty
-			for d in range(1,len(self.items)):
+			for d in range(1, len(self.items)):
 				stock_entry = frappe.new_doc("Stock Entry")
+				stock_entry.set_posting_time = True  
 				stock_entry.posting_date = self.posting_date
 				stock_entry.posting_time = self.posting_time
 				stock_entry.naming_series = '-'.join(self.naming_series.split('-')[1:])
 				stock_entry.custom_proposed_stock_entry = self.name
 				stock_entry.purpose = "Manufacture"
 				stock_entry.stock_entry_type = "Manufacture"
-				stock_entry.set_posting_time = True
-				stock_entry.posting_date = self.posting_date
 				stock_entry.process_order = self.custom_job_offer
 				if self.items[0].cost_center:
-					stock_entry.append(
-						"items",
-						{
-							"item_code": self.items[0].item_code,
-							"qty": (self.items[0].qty/tot_qty)*self.items[d].qty,
-							"uom": self.items[0].uom,
-							"s_warehouse": self.items[0].s_warehouse,
-							"batch_no": self.items[0].batch_no,
-							"cost_center": self.items[0].cost_center
-						},
-					)
+					stock_entry.append("items", {
+						"item_code": self.items[0].item_code,
+						"qty": (self.items[0].qty / tot_qty) * self.items[d].qty,
+						"uom": self.items[0].uom,
+						"s_warehouse": self.items[0].s_warehouse,
+						"batch_no": self.items[0].batch_no,
+						"cost_center": self.items[0].cost_center
+					})
 				else:
 					frappe.throw("Cost Center Is Mandatory")
+
 				if self.items[d].cost_center:
-					stock_entry.append(
-						"items",
-						{
-							"item_code": self.items[d].item_code,
-							"qty": self.items[d].qty,
-							"uom": 'KGS',
-							"t_warehouse": po.wip_warehouse,
-							"batch_no": self.items[d].batch_no,
-							"is_finished_item": True,
-							"cost_center": self.items[d].cost_center
-						},
-					)
+					stock_entry.append("items", {
+						"item_code": self.items[d].item_code,
+						"qty": self.items[d].qty,
+						"uom": 'KGS',
+						"t_warehouse": po.wip_warehouse,
+						"batch_no": self.items[d].batch_no,
+						"is_finished_item": True,
+						"cost_center": self.items[d].cost_center
+					})
 				else:
 					frappe.throw("Cost Center Is Mandatory")
+
 				for k in self.get("additional_costs"):
-					stock_entry.append("additional_costs",{
-							"expense_account": k.expense_account,
-							"description": k.description,
-							"amount": (k.amount * self.items[d].qty)/tot_qty,
-						},
-					)
+					stock_entry.append("additional_costs", {
+						"expense_account": k.expense_account,
+						"description": k.description,
+						"amount": (k.amount * self.items[d].qty) / tot_qty,
+					})
+
 				stock_entry.cost_center = self.cost_center
 				stock_entry.total_additional_costs = sum(tot_op.amount for tot_op in stock_entry.additional_costs)
-				# stock_entry.insert()
+
+				stock_entry.insert()
 				stock_entry.save()
 				stock_entry.submit()
 
