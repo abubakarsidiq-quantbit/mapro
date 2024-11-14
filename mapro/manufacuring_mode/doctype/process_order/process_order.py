@@ -252,9 +252,9 @@ class ProcessOrder(Document):
 		if not self.manufacturing_naming_series:
 			frappe.throw(_("Manufacturing Naming Series is required before Submit"))
 
-		if not self.custom_material_transfer_cost_center:
+		if not self.material_transfer_cost_center:
 			frappe.throw(_("Material Transfer Cost Center is required before Submit"))
-		if not self.custom_manufacturing_cost_center:
+		if not self.manufacturing_cost_center:
 			frappe.throw(_("Manufacturing Cost Center is required before Submit"))
 		if status == "In Process":
 			if not self.end_dt:
@@ -466,19 +466,20 @@ class ProcessOrder(Document):
 				stock_entry.batch_order = self.name
 				stock_entry.custom_job_offer = self.job_offer
 				stock_entry.process_definition = self.process_name
-				stock_entry.cost_center = self.custom_material_transfer_cost_center
-				stock_entry.append('items',{
-					's_warehouse': self.src_warehouse,
-					't_warehouse': self.wip_warehouse,
-					'item_code': self.materials[0].item,
-					'item_name': self.materials[0].item_name,
-					'qty': self.materials[0].quantity,
-					'uom': self.materials[0].uom if self.materials[0].uom else frappe.get_value("Item", self.materials[0].item, 'stock_uom'),
-					'basic_rate': self.materials[0].rate,
-					'basic_amount': self.materials[0].amount,
-					'batch_no': self.materials[0].batch_no,
-					'cost_center': self.material_transfer_cost_center
-				})
+				stock_entry.cost_center = self.material_transfer_cost_center
+				for d in self.materials:
+					stock_entry.append('items',{
+						's_warehouse': self.src_warehouse,
+						't_warehouse': self.wip_warehouse,
+						'item_code': d.item,
+						'item_name': d.item_name,
+						'qty': d.quantity,
+						'uom': d.uom if d.uom else frappe.get_value("Item", d.item, 'stock_uom'),
+						'basic_rate': d.rate,
+						'basic_amount': d.amount,
+						'batch_no': d.batch_no,
+						'cost_center': self.material_transfer_cost_center
+					})
 				self.status = "In Process"
 				self.save()
 				
