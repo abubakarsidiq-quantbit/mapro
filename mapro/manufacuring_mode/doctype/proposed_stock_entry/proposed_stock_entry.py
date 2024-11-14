@@ -222,7 +222,7 @@ class ProposedStockEntry(StockController):
 
 		self.validate_serialized_batch()
 		self.set_actual_qty()
-		self.calculate_rate_and_amount()
+		# self.calculate_rate_and_amount()
 		self.validate_putaway_capacity()
 
 		if not self.get("purpose") == "Manufacture":

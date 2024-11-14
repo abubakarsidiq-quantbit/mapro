@@ -251,6 +251,11 @@ class ProcessOrder(Document):
 			frappe.throw(_("Material Transfer Naming Series is required before Submit"))
 		if not self.manufacturing_naming_series:
 			frappe.throw(_("Manufacturing Naming Series is required before Submit"))
+
+		if not self.material_transfer_cost_center:
+			frappe.throw(_("Material Transfer Cost Center is required before Submit"))
+		if not self.manufacturing_cost_center:
+			frappe.throw(_("Manufacturing Cost Center is required before Submit"))
 		if status == "In Process":
 			if not self.end_dt:
 				self.end_dt = get_datetime()
@@ -447,6 +452,7 @@ class ProcessOrder(Document):
 			frappe.throw(_("Material Transfer Naming Series is required before Submit"))
 		if not self.manufacturing_naming_series:
 			frappe.throw(_("Manufacturing Naming Series is required before Submit"))
+
 		if self.quantity > 0:
 			stock_entry = frappe.new_doc("Proposed Stock Entry")
 			stock_entry.batch_order = self.name
@@ -457,15 +463,83 @@ class ProcessOrder(Document):
 				stock_entry.purpose = "Material Transfer for Manufacture"
 				stock_entry.naming_series = self.material_transfer_naming_series
 				stock_entry.stock_entry_type = "Material Transfer for Manufacture"
-				stock_entry = self.set_se_items_start(stock_entry)
+				stock_entry.batch_order = self.name
+				stock_entry.custom_job_offer = self.job_offer
+				stock_entry.process_definition = self.process_name
+				stock_entry.cost_center = self.material_transfer_cost_center
+				stock_entry.append('items',{
+					's_warehouse': self.src_warehouse,
+					't_warehouse': self.wip_warehouse,
+					'item_code': self.materials[0].item,
+					'item_name': self.materials[0].item_name,
+					'qty': self.materials[0].quantity,
+					'uom': self.materials[0].uom if self.materials[0].uom else frappe.get_value("Item", self.materials[0].item, 'stock_uom'),
+					'basic_rate': self.materials[0].rate,
+					'basic_amount': self.materials[0].amount,
+					'batch_no': self.materials[0].batch_no,
+					'cost_center': self.material_transfer_cost_center
+				})
 				self.status = "In Process"
 				self.save()
-
+				
 			if status == "In Process":
 				stock_entry.purpose = "Manufacture"
 				stock_entry.stock_entry_type = "Manufacture"
 				stock_entry.naming_series = self.manufacturing_naming_series
-				stock_entry = self.set_se_items_finish(stock_entry)
+				stock_entry.batch_order = self.name
+				stock_entry.custom_job_offer = self.job_offer
+				stock_entry.process_definition = self.process_name
+				stock_entry.cost_center = self.manufacturing_cost_center
+				stock_entry.append('items',{
+					's_warehouse': self.wip_warehouse,
+					'item_code': self.materials[0].item,
+					'item_name': self.materials[0].item_name,
+					'qty': self.materials[0].quantity,
+					'uom': self.materials[0].uom if self.materials[0].uom else frappe.get_value("Item", self.materials[0].item, 'stock_uom'),
+					'stock_uom': self.materials[0].uom if self.materials[0].uom else frappe.get_value("Item", self.materials[0].item, 'stock_uom'),
+					'basic_rate': self.materials[0].rate,
+					'basic_amount': self.materials[0].amount,
+					'batch_no': self.materials[0].batch_no,
+					'cost_center': self.manufacturing_cost_center,
+					'set_basic_rate_manually': True
+				})
+				
+				for fi in self.finished_products:
+					stock_entry.append('items',{
+						't_warehouse': self.fg_warehouse,
+						'item_code': fi.item,
+						'item_name': fi.item_name,
+						'qty': fi.quantity,
+						'uom': fi.uom if fi.uom else frappe.get_value("Item", fi.item, 'stock_uom'),
+						'stock_uom': fi.uom if fi.uom else frappe.get_value("Item", fi.item, 'stock_uom'),
+						'basic_rate': fi.rate,
+						'basic_amount': fi.rate * fi.quantity,
+						'additional_cost': fi.operation_cost,
+						'valuation_rate': fi.valuation_rate,
+						'amount': (fi.rate * fi.quantity) + fi.operation_cost,
+						'batch_no': fi.batch_no,
+						'is_finished_item': True,
+						'cost_center': self.manufacturing_cost_center,
+						'allow_zero_valuation_rate': True if fi.rate == 0 else False,
+						'set_basic_rate_manually': True
+					})
+				for sc in self.scrap:
+					stock_entry.append('items',{
+						't_warehouse': self.fg_warehouse,
+						'item_code': sc.item,
+						'item_name': sc.item_name,
+						'qty': sc.quantity,
+						'uom': sc.uom if sc.uom else frappe.get_value("Item", sc.item, 'stock_uom'),
+						'stock_uom': sc.uom if sc.uom else frappe.get_value("Item", sc.item, 'stock_uom'),
+						'basic_rate': sc.rate,
+						'basic_amount': sc.rate * sc.quantity,
+						'batch_no': sc.batch_no,
+						'is_scrap_item': True,
+						'cost_center': self.manufacturing_cost_center,
+						'allow_zero_valuation_rate': True if sc.rate == 0 else False,
+						'set_basic_rate_manually': True
+
+					})
 				for op in self.operation_cost:
 					stock_entry.append("additional_costs",{
 						'expense_account': op.operations,

@@ -768,9 +768,12 @@ frappe.ui.form.on('Proposed Stock Entry', {
 
 frappe.ui.form.on('Proposed Stock Entry Details', {
 	qty: function(frm, cdt, cdn) {
-		frm.events.set_serial_no(frm, cdt, cdn, () => {
-			frm.events.set_basic_rate(frm, cdt, cdn);
-		});
+		var row = locals[cdt][cdn];
+		if(row.s_warehouse){
+			frm.events.set_serial_no(frm, cdt, cdn, () => {
+				frm.events.set_basic_rate(frm, cdt, cdn);
+			});
+		}
 	},
 
 	conversion_factor: function(frm, cdt, cdn) {

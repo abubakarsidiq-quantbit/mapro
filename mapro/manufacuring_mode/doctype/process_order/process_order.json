@@ -23,8 +23,10 @@
   "costing_method",
   "section_break_a7lzz",
   "material_transfer_naming_series",
+  "material_transfer_cost_center",
   "column_break_xq7ma",
   "manufacturing_naming_series",
+  "manufacturing_cost_center",
   "warehouses_section",
   "src_warehouse",
   "wip_warehouse",
@@ -191,6 +193,7 @@
    "label": "Finished Products"
   },
   {
+   "allow_bulk_edit": 1,
    "allow_on_submit": 1,
    "fieldname": "finished_products",
    "fieldtype": "Table",
@@ -478,6 +481,18 @@
    "fieldtype": "Select",
    "label": "Manufacturing Naming Series",
    "options": "\nP-MAT-STE-.FY.-\nP-C/CUT/.FY./.##.\nP-C/PEELING/.FY./.##.\nP-C/WGRD/.FY./.###.\nP-C/SGRD/.FY./.###.\nP-C/RPS/.FY./.##.\nP-C/SRPS/.FY./.##.\nP-C/WRPS/.FY./.##.\nP-C/OPCUT/.FY./.##.\nP-C/OPGRD/.FY./.##.\nP-C/OPPEEL/.FY./.##.\nP-MAT-STE-.YYYY.-\nP-C/CUT/23-24/.##.\nP-C/PEELING/23-24/.##.\nP-C/WGRD/23-24/.###.\nP-C/SGRD/23-24/.###.\nP-C/RPS/23-24/.##.\nP-C/SRPS/23-24/.##.\nP-C/WRPS/23-24/.##.\nP-C/OPCUT/23-24/.##.\nP-C/OPGRD/23-24/.##.\nP-C/OPPEEL/23-24/.##."
+  },
+  {
+   "fieldname": "material_transfer_cost_center",
+   "fieldtype": "Link",
+   "label": "Material Transfer Cost Center",
+   "options": "Cost Center"
+  },
+  {
+   "fieldname": "manufacturing_cost_center",
+   "fieldtype": "Link",
+   "label": "Manufacturing Cost Center",
+   "options": "Cost Center"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -488,7 +503,7 @@
    "link_fieldname": "process_order"
   }
  ],
- "modified": "2024-10-25 14:23:44.282767",
+ "modified": "2024-11-14 14:08:47.141741",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Process Order",

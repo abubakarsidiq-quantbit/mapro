@@ -146,19 +146,9 @@ frappe.ui.form.on('Process Order', {
         }
         if (!frm.doc.__islocal && frm.doc.status == 'In Process') {
             var finish_btn = frm.add_custom_button(__('Complete'), function () {
-                // prompt_for_qty(frm, "finished_products", "Enter Produced Quantity", true, function () {
-                //     if (frm.doc.scrap) {
-                //         prompt_for_qty(frm, "scrap", "Enter Scrap Quantity", false, function () {
-                //             prompt_for_hours(frm, function () {
-                //                 process_production(frm, "In Process");
-                //             });
-                //         });
-                //     } else {
-                        prompt_for_hours(frm, function () {
-                            process_production(frm, "In Process");
-                        });
-                //     }
-                // });
+                prompt_for_hours(frm, function () {
+                    process_production(frm, "In Process");
+                });
             });
             finish_btn.addClass('btn-primary')
         }
@@ -245,6 +235,7 @@ var prompt_for_hours = function (frm, callback) {
 var process_production = function (frm, status) {
     frappe.call({
         doc: frm.doc,
+        // freeze: true,
         method: "start_finish_processing",
         args: {
             "status": status
