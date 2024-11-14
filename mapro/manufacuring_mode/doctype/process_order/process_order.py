@@ -490,7 +490,7 @@ class ProcessOrder(Document):
 				stock_entry.batch_order = self.name
 				stock_entry.custom_job_offer = self.job_offer
 				stock_entry.process_definition = self.process_name
-				stock_entry.cost_center = self.custom_manufacturing_cost_center
+				stock_entry.cost_center = self.manufacturing_cost_center
 				stock_entry.append('items',{
 					's_warehouse': self.wip_warehouse,
 					'item_code': self.materials[0].item,
