@@ -252,9 +252,9 @@ class ProcessOrder(Document):
 		if not self.manufacturing_naming_series:
 			frappe.throw(_("Manufacturing Naming Series is required before Submit"))
 
-		if not self.material_transfer_cost_center:
+		if not self.custom_material_transfer_cost_center:
 			frappe.throw(_("Material Transfer Cost Center is required before Submit"))
-		if not self.manufacturing_cost_center:
+		if not self.custom_manufacturing_cost_center:
 			frappe.throw(_("Manufacturing Cost Center is required before Submit"))
 		if status == "In Process":
 			if not self.end_dt:
@@ -466,7 +466,7 @@ class ProcessOrder(Document):
 				stock_entry.batch_order = self.name
 				stock_entry.custom_job_offer = self.job_offer
 				stock_entry.process_definition = self.process_name
-				stock_entry.cost_center = self.material_transfer_cost_center
+				stock_entry.cost_center = self.custom_material_transfer_cost_center
 				stock_entry.append('items',{
 					's_warehouse': self.src_warehouse,
 					't_warehouse': self.wip_warehouse,
@@ -489,7 +489,7 @@ class ProcessOrder(Document):
 				stock_entry.batch_order = self.name
 				stock_entry.custom_job_offer = self.job_offer
 				stock_entry.process_definition = self.process_name
-				stock_entry.cost_center = self.manufacturing_cost_center
+				stock_entry.cost_center = self.custom_manufacturing_cost_center
 				stock_entry.append('items',{
 					's_warehouse': self.wip_warehouse,
 					'item_code': self.materials[0].item,
