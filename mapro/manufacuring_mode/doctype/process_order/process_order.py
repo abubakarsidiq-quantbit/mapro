@@ -484,6 +484,7 @@ class ProcessOrder(Document):
 				self.save()
 				
 			if status == "In Process":
+				incom = 0
 				stock_entry.purpose = "Manufacture"
 				stock_entry.stock_entry_type = "Manufacture"
 				stock_entry.naming_series = self.manufacturing_naming_series
@@ -502,10 +503,12 @@ class ProcessOrder(Document):
 					'basic_amount': self.materials[0].amount,
 					'batch_no': self.materials[0].batch_no,
 					'cost_center': self.manufacturing_cost_center,
-					'set_basic_rate_manually': True
+					'set_basic_rate_manually': True,
+					'amount': self.materials[0].amount,
 				})
 				
 				for fi in self.finished_products:
+					incom += (fi.rate * fi.quantity) + fi.operation_cost
 					stock_entry.append('items',{
 						't_warehouse': self.fg_warehouse,
 						'item_code': fi.item,
@@ -548,6 +551,9 @@ class ProcessOrder(Document):
 						'description': 'None'
 					})
 				stock_entry.total_additional_costs = sum(tot_op.cost for tot_op in self.operation_cost)
+				stock_entry.total_outgoing_value = self.materials[0].amount
+				stock_entry.total_incoming_value = incom
+				stock_entry.value_difference = incom - self.materials[0].amount
 				self.status = "Completed"
 				self.save()
 
