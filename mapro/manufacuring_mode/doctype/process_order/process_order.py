@@ -93,9 +93,6 @@ class ProcessOrder(Document):
 			tbam=float(fp.quantity)*float(fp.rate)
 			fp.amount=tbam
 			pricelst = frappe.get_all("Manufacturing Rate Chart",{'process_type':self.process_type,'item_code':fp.item,'from_date': ['<',date.today()]},"rate")
-			# if len(pricelst)>=2:
-			# 	frappe.throw(f"There Are Multiple Rate Chart For {fp.item} Item At Manufacturing Rate Chart.")
-			# else:
 			if pricelst:
 				fp.manufacturing_rate = pricelst[0]['rate']
 				fp.sale_value = fp.quantity * fp.manufacturing_rate
@@ -134,7 +131,7 @@ class ProcessOrder(Document):
 			else:
 				fp.basic_value = 0
 		total_basic_value = sum(fp.basic_value for fp in self.get("finished_products"))
-		total_scrap_basic_value = sum(fp.basic_value for fp in self.get("finished_products"))
+		total_scrap_basic_value = sum(sc.basic_value for sc in self.get("scrap"))
 
 		for fp in self.get('finished_products'):
 			if total_basic_value:
@@ -401,16 +398,6 @@ class ProcessOrder(Document):
 
 			item_expense_account, item_cost_center = (None,None)
 			
-			# frappe.db.get_value("Item Default",
-			# 															 {'parent': item.item, 'company': self.company}, \
-			# 															 {'parent': item.item, 'company': self.company},
-			# 															 ["expense_account", "buying_cost_center"])
-
-			# if not expense_account and not item_expense_account:
-			# 	frappe.throw(
-			# 		_("Please update default Default Cost of Goods Sold Account for company {0}").format(self.company))
-			# if not cost_center and not item_cost_center:
-			# 	frappe.throw(_("Please update default Cost Center for company {0}").format(self.company))
 			se_item = se.append("items")
 			se_item.item_code = item.item
 			se_item.qty = item.quantity
@@ -474,6 +461,7 @@ class ProcessOrder(Document):
 						'item_code': d.item,
 						'item_name': d.item_name,
 						'qty': d.quantity,
+						'stock_uom': d.uom if d.uom else frappe.get_value("Item", d.item, 'stock_uom'),
 						'uom': d.uom if d.uom else frappe.get_value("Item", d.item, 'stock_uom'),
 						'basic_rate': d.rate,
 						'basic_amount': d.amount,
@@ -508,19 +496,23 @@ class ProcessOrder(Document):
 				})
 				
 				for fi in self.finished_products:
-					incom += (fi.rate * fi.quantity) + fi.operation_cost
+					incom += (fi.valuation_rate * fi.quantity)
 					stock_entry.append('items',{
 						't_warehouse': self.fg_warehouse,
 						'item_code': fi.item,
 						'item_name': fi.item_name,
+						'yeild': fi.yeild,
 						'qty': fi.quantity,
 						'uom': fi.uom if fi.uom else frappe.get_value("Item", fi.item, 'stock_uom'),
 						'stock_uom': fi.uom if fi.uom else frappe.get_value("Item", fi.item, 'stock_uom'),
 						'basic_rate': fi.rate,
-						'basic_amount': fi.rate * fi.quantity,
+						'basic_amount': fi.basic_value,
 						'additional_cost': fi.operation_cost,
 						'valuation_rate': fi.valuation_rate,
-						'amount': (fi.rate * fi.quantity) + fi.operation_cost,
+						'sales_value': fi.sale_value,
+						'manufacturing_rate': fi.manufacturing_rate,
+						'total_cost': fi.total_cost,
+						'amount': fi.amount,
 						'batch_no': fi.batch_no,
 						'is_finished_item': True,
 						'cost_center': self.manufacturing_cost_center,
@@ -532,11 +524,17 @@ class ProcessOrder(Document):
 						't_warehouse': self.fg_warehouse,
 						'item_code': sc.item,
 						'item_name': sc.item_name,
+						'yeild': fi.yeild,
 						'qty': sc.quantity,
 						'uom': sc.uom if sc.uom else frappe.get_value("Item", sc.item, 'stock_uom'),
 						'stock_uom': sc.uom if sc.uom else frappe.get_value("Item", sc.item, 'stock_uom'),
 						'basic_rate': sc.rate,
 						'basic_amount': sc.rate * sc.quantity,
+						'valuation_rate': sc.valuation_rate,
+						'sales_value': sc.sale_value,
+						'manufacturing_rate': sc.manufacturing_rate,
+						'total_cost': fi.total_cost,
+						'amount': sc.amount,
 						'batch_no': sc.batch_no,
 						'is_scrap_item': True,
 						'cost_center': self.manufacturing_cost_center,
@@ -556,7 +554,7 @@ class ProcessOrder(Document):
 				stock_entry.value_difference = incom - self.materials[0].amount
 				self.status = "Completed"
 				self.save()
-
+			
 			return stock_entry.as_dict()
 	
 	@frappe.whitelist()	
@@ -569,14 +567,12 @@ class ProcessOrder(Document):
 			
 @frappe.whitelist()			
 def validate_items(se_items, po_items):
-	# validate for items not in process order
 	for se_item in se_items:
 		if not filter(lambda x: x.item == se_item.item_code, po_items):
 			frappe.throw(
 				_("Item {0} - {1} cannot be part of this Stock Entry").format(se_item.item_code, se_item.item_name))
 @frappe.whitelist()
 def validate_material_qty(se_items, po_items):
-	# TODO allow multiple raw material transfer?
 	for material in po_items:
 		qty = 0
 		for item in se_items:

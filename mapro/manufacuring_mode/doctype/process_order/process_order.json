@@ -502,10 +502,10 @@
  "links": [
   {
    "link_doctype": "Proposed Stock Entry",
-   "link_fieldname": "process_order"
+   "link_fieldname": "batch_order"
   }
  ],
- "modified": "2024-11-14 15:54:18.427470",
+ "modified": "2024-11-14 17:35:12.360895",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Process Order",

@@ -146,16 +146,34 @@ class ProposedStockEntry(StockController):
 				stock_entry.save()
 				stock_entry.submit()
 
-	# def before_save(self):
-	# 	qty_sr, qty_tr = 0, 0
-	# 	for itm in self.items:
-	# 		if itm.s_warehouse:
-	# 			qty_sr += itm.qty
-	# 		if itm.t_warehouse:
-	# 			qty_tr += itm.qty
-	# 	self.custom_quantity_difference_ = qty_sr - qty_tr
-	# 	if qty_sr > 0:
-	# 		self.custom_in_qty_kg  = self.total_additional_costs / qty_sr
+	def before_save(self):
+		for itm in self.items:
+			if itm.is_finished_item:
+				itm.sales_value = itm.qty * itm.manufacturing_rate
+		total_sale_value, material_amount, total_basic_value, incom = 0, 0, 0, 0
+		for itm in self.items:
+			if itm.is_finished_item:
+				total_sale_value += itm.sales_value
+		for itm in self.items:
+			if itm.s_warehouse:
+				material_amount = itm.amount
+		for itm in self.items:
+			if itm.is_finished_item:
+				itm.basic_amount = (itm.sales_value / total_sale_value) * material_amount
+		for itm in self.items:
+			if itm.is_finished_item:
+				total_basic_value += itm.basic_amount
+		for itm in self.items:
+			if itm.is_finished_item:
+				itm.additional_cost = (itm.basic_amount/total_basic_value) * self.total_additional_costs
+				itm.total_cost = itm.additional_cost + itm.basic_amount
+				itm.valuation_rate = itm.total_cost / itm.qty
+				itm.amount = itm.valuation_rate * itm.qty
+				incom += itm.amount
+
+		self.total_outgoing_value = material_amount
+		self.total_incoming_value = incom
+		self.value_difference = incom - material_amount
 
 	@frappe.whitelist()
 	def diffqty(self):

@@ -40,12 +40,16 @@
   "rates_section",
   "basic_rate",
   "additional_cost",
+  "sales_value",
   "valuation_rate",
   "allow_zero_valuation_rate",
   "col_break3",
   "set_basic_rate_manually",
   "basic_amount",
   "amount",
+  "manufacturing_rate",
+  "total_cost",
+  "yeild",
   "serial_no_batch",
   "serial_no",
   "col_break4",
@@ -338,7 +342,7 @@
   {
    "fieldname": "basic_amount",
    "fieldtype": "Currency",
-   "label": "Basic Amount",
+   "label": "Basic Value",
    "options": "Company:company:default_currency",
    "print_hide": 1,
    "read_only": 1
@@ -568,12 +572,35 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "sales_value",
+   "fieldtype": "Currency",
+   "label": "Sales Value",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "fieldname": "manufacturing_rate",
+   "fieldtype": "Currency",
+   "label": "Manufacturing Rate",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "fieldname": "yeild",
+   "fieldtype": "Float",
+   "label": "Yeild"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Currency",
+   "label": "Total Cost",
+   "options": "Company:company:default_currency"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-08-01 12:52:40.252152",
+ "modified": "2024-11-15 09:52:02.641745",
  "modified_by": "Administrator",
  "module": "manufacuring mode",
  "name": "Proposed Stock Entry Details",
