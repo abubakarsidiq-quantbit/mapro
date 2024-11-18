@@ -94,71 +94,77 @@ class ProposedStockEntry(StockController):
 			stock_entry.submit()
 
 		if self.stock_entry_type == "Manufacture":
-			tot_qty = 0
-			for i in range(1, len(self.items)):
-				tot_qty += self.items[i].qty
+			tot_qty, tot_basic_amt = 0, 0
+			for i in self.items:
+				if i.t_warehouse:
+					tot_qty += i.qty
+					tot_basic_amt +=  i.basic_amount
 			for d in range(1, len(self.items)):
-				stock_entry = frappe.new_doc("Stock Entry")
-				stock_entry.set_posting_time = True  
-				stock_entry.posting_date = self.posting_date
-				stock_entry.posting_time = self.posting_time
-				stock_entry.naming_series = '-'.join(self.naming_series.split('-')[1:])
-				stock_entry.custom_proposed_stock_entry = self.name
-				stock_entry.purpose = "Manufacture"
-				stock_entry.stock_entry_type = "Manufacture"
-				stock_entry.process_order = self.custom_job_offer
-				if self.items[0].cost_center:
-					stock_entry.append("items", {
-						"item_code": self.items[0].item_code,
-						"qty": (self.items[0].qty / tot_qty) * self.items[d].qty,
-						"uom": self.items[0].uom,
-						"s_warehouse": self.items[0].s_warehouse,
-						"batch_no": self.items[0].batch_no,
-						"cost_center": self.items[0].cost_center
-					})
-				else:
-					frappe.throw("Cost Center Is Mandatory")
+				if ((self.items[d].basic_amount/tot_basic_amt) * self.items[0].qty) > 0:
+					stock_entry = frappe.new_doc("Stock Entry")
+					stock_entry.set_posting_time = True  
+					stock_entry.posting_date = self.posting_date
+					stock_entry.posting_time = self.posting_time
+					stock_entry.naming_series = '-'.join(self.naming_series.split('-')[1:])
+					stock_entry.custom_proposed_stock_entry = self.name
+					stock_entry.purpose = "Manufacture"
+					stock_entry.stock_entry_type = "Manufacture"
+					stock_entry.process_order = self.custom_job_offer
+					if self.items[0].cost_center:
+						stock_entry.append("items", {
+							"item_code": self.items[0].item_code,
+							"qty": (self.items[d].basic_amount/tot_basic_amt) * self.items[0].qty,
+							"uom": self.items[0].uom,
+							"s_warehouse": self.items[0].s_warehouse,
+							"batch_no": self.items[0].batch_no,
+							"cost_center": self.items[0].cost_center
+						})
+					else:
+						frappe.throw("Cost Center Is Mandatory")
 
-				if self.items[d].cost_center:
-					stock_entry.append("items", {
-						"item_code": self.items[d].item_code,
-						"qty": self.items[d].qty,
-						"uom": 'KGS',
-						"t_warehouse": po.wip_warehouse,
-						"batch_no": self.items[d].batch_no,
-						"is_finished_item": True,
-						"cost_center": self.items[d].cost_center
-					})
-				else:
-					frappe.throw("Cost Center Is Mandatory")
+					if self.items[d].cost_center:
+						stock_entry.append("items", {
+							"item_code": self.items[d].item_code,
+							"qty": self.items[d].qty,
+							"uom": 'KGS',
+							"t_warehouse": po.wip_warehouse,
+							"batch_no": self.items[d].batch_no,
+							"is_finished_item": True,
+							"cost_center": self.items[d].cost_center
+						})
+					else:
+						frappe.throw("Cost Center Is Mandatory")
 
-				for k in self.get("additional_costs"):
-					stock_entry.append("additional_costs", {
-						"expense_account": k.expense_account,
-						"description": k.description,
-						"amount": (k.amount * self.items[d].qty) / tot_qty,
-					})
+					for k in self.get("additional_costs"):
+						stock_entry.append("additional_costs", {
+							"expense_account": k.expense_account,
+							"description": k.description,
+							"amount": k.amount * (self.items[d].basic_amount/tot_basic_amt),
+						})
 
-				stock_entry.cost_center = self.cost_center
-				stock_entry.total_additional_costs = sum(tot_op.amount for tot_op in stock_entry.additional_costs)
+					stock_entry.cost_center = self.cost_center
+					stock_entry.total_additional_costs = sum(tot_op.amount for tot_op in stock_entry.additional_costs)
 
-				stock_entry.insert()
-				stock_entry.save()
-				stock_entry.submit()
+					stock_entry.insert()
+					stock_entry.save()
+					stock_entry.submit()
 
 	def before_save(self):
+		self.calculate_rate_and_amount()
+		total_sale_value, material_amount, material_qty, total_basic_value, incom = 0, 0, 0, 0, 0
+		for itm in self.items:
+			if itm.s_warehouse:
+				material_qty += itm.qty
+				material_amount += itm.amount
 		for itm in self.items:
 			if itm.is_finished_item:
 				itm.sales_value = itm.qty * itm.manufacturing_rate
-		total_sale_value, material_amount, total_basic_value, incom = 0, 0, 0, 0
 		for itm in self.items:
 			if itm.is_finished_item:
 				total_sale_value += itm.sales_value
 		for itm in self.items:
-			if itm.s_warehouse:
-				material_amount = itm.amount
-		for itm in self.items:
 			if itm.is_finished_item:
+				itm.yeild = (itm.qty/material_qty) * 100
 				itm.basic_amount = (itm.sales_value / total_sale_value) * material_amount
 		for itm in self.items:
 			if itm.is_finished_item:
@@ -170,6 +176,7 @@ class ProposedStockEntry(StockController):
 				itm.valuation_rate = itm.total_cost / itm.qty
 				itm.amount = itm.valuation_rate * itm.qty
 				incom += itm.amount
+				itm.basic_rate = itm.basic_amount / itm.qty
 
 		self.total_outgoing_value = material_amount
 		self.total_incoming_value = incom
@@ -1004,56 +1011,56 @@ class ProposedStockEntry(StockController):
 		"""
 		# Set rate for outgoing items
 		outgoing_items_cost = self.set_rate_for_outgoing_items(reset_outgoing_rate, raise_error_if_no_rate)
-		finished_item_qty = sum(d.transfer_qty for d in self.items if d.is_finished_item)
+		# finished_item_qty = sum(d.transfer_qty for d in self.items if d.is_finished_item)
 
-		items = []
-		# Set basic rate for incoming items
-		for d in self.get("items"):
-			if d.s_warehouse or d.set_basic_rate_manually:
-				continue
+		# items = []
+		# # Set basic rate for incoming items
+		# for d in self.get("items"):
+		# 	if d.s_warehouse or d.set_basic_rate_manually:
+		# 		continue
 
-			if d.allow_zero_valuation_rate:
-				d.basic_rate = 0.0
-				items.append(d.item_code)
+		# 	if d.allow_zero_valuation_rate:
+		# 		d.basic_rate = 0.0
+		# 		items.append(d.item_code)
 
-			elif d.is_finished_item:
-				if self.purpose == "Manufacture":
-					d.basic_rate = self.get_basic_rate_for_manufactured_item(
-						finished_item_qty, outgoing_items_cost
-					)
-				elif self.purpose == "Repack":
-					d.basic_rate = self.get_basic_rate_for_repacked_items(d.transfer_qty, outgoing_items_cost)
+		# 	elif d.is_finished_item:
+		# 		if self.purpose == "Manufacture":
+		# 			d.basic_rate = self.get_basic_rate_for_manufactured_item(
+		# 				finished_item_qty, outgoing_items_cost
+		# 			)
+		# 		elif self.purpose == "Repack":
+		# 			d.basic_rate = self.get_basic_rate_for_repacked_items(d.transfer_qty, outgoing_items_cost)
 
-			if not d.basic_rate and not d.allow_zero_valuation_rate:
-				d.basic_rate = get_valuation_rate(
-					d.item_code,
-					d.t_warehouse,
-					self.doctype,
-					self.name,
-					d.allow_zero_valuation_rate,
-					currency=erpnext.get_company_currency(self.company),
-					company=self.company,
-					raise_error_if_no_rate=raise_error_if_no_rate,
-					batch_no=d.batch_no,
-				)
+		# 	if not d.basic_rate and not d.allow_zero_valuation_rate:
+		# 		d.basic_rate = get_valuation_rate(
+		# 			d.item_code,
+		# 			d.t_warehouse,
+		# 			self.doctype,
+		# 			self.name,
+		# 			d.allow_zero_valuation_rate,
+		# 			currency=erpnext.get_company_currency(self.company),
+		# 			company=self.company,
+		# 			raise_error_if_no_rate=raise_error_if_no_rate,
+		# 			batch_no=d.batch_no,
+		# 		)
 
-			# do not round off basic rate to avoid precision loss
-			d.basic_rate = flt(d.basic_rate)
-			d.basic_amount = flt(flt(d.transfer_qty) * flt(d.basic_rate), d.precision("basic_amount"))
+		# 	# do not round off basic rate to avoid precision loss
+		# 	d.basic_rate = flt(d.basic_rate)
+		# 	d.basic_amount = flt(flt(d.transfer_qty) * flt(d.basic_rate), d.precision("basic_amount"))
 
-		if items:
-			message = ""
+		# if items:
+		# 	message = ""
 
-			if len(items) > 1:
-				message = (
-					"Items rate has been updated to zero as Allow Zero Valuation Rate is checked for the following items: {0}"
-				).format(", ".join(frappe.bold(item) for item in items))
-			else:
-				message = (
-					"Item rate has been updated to zero as Allow Zero Valuation Rate is checked for item {0}"
-				).format(frappe.bold(items[0]))
+		# 	if len(items) > 1:
+		# 		message = (
+		# 			"Items rate has been updated to zero as Allow Zero Valuation Rate is checked for the following items: {0}"
+		# 		).format(", ".join(frappe.bold(item) for item in items))
+		# 	else:
+		# 		message = (
+		# 			"Item rate has been updated to zero as Allow Zero Valuation Rate is checked for item {0}"
+		# 		).format(frappe.bold(items[0]))
 
-			frappe.msgprint(message, alert=True)
+		# 	frappe.msgprint(message, alert=True)
 	
 	def set_rate_for_outgoing_items(self, reset_outgoing_rate=True, raise_error_if_no_rate=True):
 		outgoing_items_cost = 0.0

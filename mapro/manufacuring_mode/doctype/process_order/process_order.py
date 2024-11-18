@@ -505,7 +505,7 @@ class ProcessOrder(Document):
 						'qty': fi.quantity,
 						'uom': fi.uom if fi.uom else frappe.get_value("Item", fi.item, 'stock_uom'),
 						'stock_uom': fi.uom if fi.uom else frappe.get_value("Item", fi.item, 'stock_uom'),
-						'basic_rate': fi.rate,
+						'basic_rate': fi.basic_value/ fi.quantity,
 						'basic_amount': fi.basic_value,
 						'additional_cost': fi.operation_cost,
 						'valuation_rate': fi.valuation_rate,
