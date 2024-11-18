@@ -183,6 +183,11 @@ class ProposedStockEntry(StockController):
 		self.total_incoming_value = incom
 		self.value_difference = incom - material_amount
 
+		add_cost = 0
+		for ad in self.additional_costs:
+			add_cost = add_cost + ad.amount
+		self.total_additional_costs = add_cost
+
 	@frappe.whitelist()
 	def diffqty(self):
 		if self.stock_entry_type == 'Manufacture':
