@@ -127,7 +127,7 @@ class ProposedStockEntry(StockController):
 							"item_code": self.items[d].item_code,
 							"qty": self.items[d].qty,
 							"uom": 'KGS',
-							"t_warehouse": po.wip_warehouse,
+							"t_warehouse": self.items[d].t_warehouse,
 							"batch_no": self.items[d].batch_no,
 							"is_finished_item": True,
 							"cost_center": self.items[d].cost_center
