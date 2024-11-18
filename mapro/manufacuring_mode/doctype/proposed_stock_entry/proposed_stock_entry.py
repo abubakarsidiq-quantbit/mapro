@@ -158,7 +158,7 @@ class ProposedStockEntry(StockController):
 				total_sale_value += itm.sales_value
 		for itm in self.items:
 			if itm.s_warehouse:
-				material_qty + itm.qty
+				material_qty += itm.qty
 				material_amount += itm.amount
 		for itm in self.items:
 			if itm.is_finished_item:
