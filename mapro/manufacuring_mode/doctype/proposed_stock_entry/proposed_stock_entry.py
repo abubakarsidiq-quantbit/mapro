@@ -94,9 +94,11 @@ class ProposedStockEntry(StockController):
 			stock_entry.submit()
 
 		if self.stock_entry_type == "Manufacture":
-			tot_qty = 0
-			for i in range(1, len(self.items)):
-				tot_qty += self.items[i].qty
+			tot_qty, tot_basic_amt = 0, 0
+			for i in self.items:
+				if i.t_warehouse:
+					tot_qty += i.qty
+					tot_basic_amt +=  i.basic_amount
 			for d in range(1, len(self.items)):
 				stock_entry = frappe.new_doc("Stock Entry")
 				stock_entry.set_posting_time = True  
@@ -110,7 +112,7 @@ class ProposedStockEntry(StockController):
 				if self.items[0].cost_center:
 					stock_entry.append("items", {
 						"item_code": self.items[0].item_code,
-						"qty": (self.items[0].qty / tot_qty) * self.items[d].qty,
+						"qty": (self.items[d].basic_amount/tot_basic_amt) * self.items[0].qty,
 						"uom": self.items[0].uom,
 						"s_warehouse": self.items[0].s_warehouse,
 						"batch_no": self.items[0].batch_no,
@@ -150,15 +152,17 @@ class ProposedStockEntry(StockController):
 		for itm in self.items:
 			if itm.is_finished_item:
 				itm.sales_value = itm.qty * itm.manufacturing_rate
-		total_sale_value, material_amount, total_basic_value, incom = 0, 0, 0, 0
+		total_sale_value, material_amount, material_qty, total_basic_value, incom = 0, 0, 0, 0, 0
 		for itm in self.items:
 			if itm.is_finished_item:
 				total_sale_value += itm.sales_value
 		for itm in self.items:
 			if itm.s_warehouse:
-				material_amount = itm.amount
+				material_qty + itm.qty
+				material_amount += itm.amount
 		for itm in self.items:
 			if itm.is_finished_item:
+				itm.yeild = (itm.qty/material_qty) * 100
 				itm.basic_amount = (itm.sales_value / total_sale_value) * material_amount
 		for itm in self.items:
 			if itm.is_finished_item:
