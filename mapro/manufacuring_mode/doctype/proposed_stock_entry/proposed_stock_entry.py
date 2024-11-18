@@ -149,6 +149,7 @@ class ProposedStockEntry(StockController):
 					stock_entry.save()
 					stock_entry.submit()
 
+
 	def before_save(self):
 		self.calculate_rate_and_amount()
 		total_sale_value, material_amount, material_qty, total_basic_value, incom = 0, 0, 0, 0, 0
