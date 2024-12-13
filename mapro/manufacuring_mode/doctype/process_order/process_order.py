@@ -218,7 +218,7 @@ class ProcessOrder(Document):
 		data = frappe.db.sql("""
 								SELECT SUM(quantity) quantity
 								FROM `tabProcess Order`
-								WHERE job_offer=%s
+								WHERE job_offer=%s and docstatus = 1
 							""",(self.job_offer),as_dict="True")
 		tota_soso = (data[0]['quantity']) if (data[0]['quantity'])	 else 0
 		# frappe.msgprint(str(tota_soso))
